@@ -1,0 +1,11 @@
+{
+  "name": "spryker-review",
+  "description": "Multi-pass thoughtful code review for Spryker projects: SOLID, DRY, YAGNI, KISS, TDA, SoC, performance, tests, contracts, dead-code, security, deploy safety. Read-only.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Sebastian Wasiewicz"
+  },
+  "homepage": "https://github.com/Zaftri/code-review-spryker-claude-plugin",
+  "repository": "https://github.com/Zaftri/code-review-spryker-claude-plugin.git",
+  "license": "MIT"
+}
