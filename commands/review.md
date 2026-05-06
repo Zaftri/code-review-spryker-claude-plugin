@@ -49,6 +49,7 @@ A change is in a "hotspot" if any modified path matches one or more of these glo
 | **Performance / N+1 candidates** | `*Repository.php`, `*EntityManager.php`, `Communication/Console/*.php`, files with new `foreach` over query results | D |
 | **Tests** | `tests/PyzTest/**/*.php`, `tests/PyzTest/**/*.feature` | E |
 | **Frontend (heavy)** | `src/Pyz/**/Presentation/assets/{js,ts,scss}/**` over ~200 LOC changed | B' |
+| **Deploy / runtime smoke** | `config/post-deploy/*.yml` added/modified, OR a console newly registered in `ConsoleDependencyProvider`, OR a `*DependencyProvider.php` diff that **removes/moves** an `add*` method (detect via `git diff <range> -- '*DependencyProvider.php' \| grep -E '^-.*function add'`) | G |
 
 ## Step 1.6: Degradation / failure modes
 
@@ -154,6 +155,16 @@ Every dispatched agent MUST receive these as ground rules, in priority order:
    - For transfer fields: match each new XML `<property name="X">` against `getX`/`setX` in PHP
    - For schema columns: match each new `<column name="X">` against `filterByX`, `getX`, `setX` in repositories/entity managers
 
+8. **Pre-flight: two diff-level questions** — before applying any pattern-match rule (rules 1–7), every Pass A / B / D / G agent MUST enumerate the answers to these two questions about the diff and include both enumerations near the top of its response. Findings that surface from these enumerations outrank later pattern-match findings.
+
+   **Q1 — What invariants does this diff assert?**
+   List every "must hold" property the diff introduces or relies on: uniqueness ("at most one X per Y"), totality ("every Y has at least one X"), default-presence ("every Y has exactly one X with `flag=true`"), referential ("every X.fk_y resolves"), monotonicity, conservation, **first-pick determinism** (any `findOne` / `reset()` / `[0]` over a multi-row source needs an ordering whose key is unique on the result set). For each invariant, enumerate every code path that **writes** the affected state. Then prove each writer establishes or preserves the invariant. Asymmetry across writers (e.g. update path sets the flag, create path doesn't) ⇒ Critical.
+
+   **Q2 — What identifiers does this diff remove, rename, or relocate?**
+   List every removed / renamed / moved DI key, method, transfer field, schema column, plugin registration, route, container key, or default-value contract (this includes *implicit* removal — e.g. a partial DTO whose `toArray()` emits absent fields as `null`, deleting them on the deserialiser side). For each, grep all consumers in scope plus parent classes / inherited factories. Any consumer not explicitly updated ⇒ Critical (broken contract).
+
+   These two questions are framework-agnostic; Spryker-specific instances (DI container-layer separation, `AbstractTransfer::toArray()` null-emission, partial-unique-index workarounds, backfill-vs-runtime parity) are *examples* of the questions, not separate rules. If a Spryker-specific instance is the dominant risk in this diff, name it explicitly under the relevant question.
+
 ## Step 3: Dispatch review passes (parallel Agent calls)
 
 Use the **Agent** tool. Send all independent passes in a SINGLE message with multiple tool calls.
@@ -170,11 +181,12 @@ Use the **Agent** tool. Send all independent passes in a SINGLE message with mul
 | D — Performance / N+1 | ✅ if perf hotspot | ❌ skipped | Repository/EntityManager/console loops |
 | E — Test quality | ✅ if test hotspot or hotspots flagged | ❌ skipped | tests changed OR Pass A/C flagged untested code |
 | F — API/contract | ✅ if API surface hotspot | ❌ skipped | Facade/Plugin/Transfer XML |
+| G — Deploy & runtime smoke | ✅ if Deploy/runtime hotspot | ✅ if Deploy/runtime hotspot | per Step 1.4 (DP `add*` removed/moved, new console, new post-deploy YAML) |
 | Validator | ✅ always | ✅ always | always |
 
 **Worst-case agent count:**
-- Full mode: 8 parallel + 1 validator = **9 agents**
-- Light mode: 3 parallel (A + B + C1) + 1 validator = **4 agents**
+- Full mode: 9 parallel + 1 validator = **10 agents** (G fires only when its narrow trigger matches; on most reviews 8 parallel)
+- Light mode: 3 parallel (A + B + C1) + 1 validator = **4 agents** (+ G if its trigger fires)
 - Hotspots-only (user picks at Step 1): 1–2 parallel + validator = **2–3 agents**
 
 ### Agent prompt requirements
@@ -235,7 +247,11 @@ Each agent prompt MUST:
 - `subagent_type: quality-engineer`
 - Scope:
   - **Real assertions**: no `assertTrue(true)`, no assertion-free tests; per project CLAUDE.md
-  - **Hotspot coverage**: every Critical/Major finding from other passes — does a test exist that would have caught it?
+  - **State-transition coverage**: for every new/modified Facade method, every new/modified Plugin, and every new column with semantic meaning (`is_default`, `is_disabled`, `fk_*`):
+    1. List every code path that **writes** the column / triggers the state transition
+    2. List every **invariant** the column carries (e.g. "every active user has exactly one `is_default=true` row")
+    3. For each (write-path × invariant), assert a test exists that exercises the path AND asserts the invariant holds afterwards
+    If no test exists ⇒ flag with sev=Major (untested state transition), even if the production code looks correct. Subsumes the older "every Critical/Major finding has a test" check.
   - **Pyramid balance**: too many slow Acceptance tests vs missing Unit tests
   - **Edge cases**: nulls, empty collections, boundary values, error paths, concurrent writes (where relevant)
   - **Snapshot/contract tests** for new public Facade methods
@@ -254,6 +270,14 @@ Each agent prompt MUST:
   - **GLUE API**: removed/renamed resources, response shape changes
   - For every breaking change: list affected callers (`grep -rn 'methodName' vendor/ src/ tests/`) and propose a deprecation path.
 
+### Pass G — Deploy & runtime smoke (only when Deploy/runtime hotspot triggers per Step 1.4)
+- `subagent_type: backend-architect`
+- Goal: walk every command in any added/modified `config/post-deploy/*.yml` AND every console newly registered in `ConsoleDependencyProvider`, AND every `add*` method removed/moved between `provideBusinessLayerDependencies` / `provideCommunicationLayerDependencies` / `provideClientDependencies`. For each:
+  1. **Container-key trace.** Identify every container key the command's factory chain reads (grep up from `Console::execute` through `CommunicationFactory` + Bridges + parent factory). For each key, confirm the corresponding `add*Dependency` exists in the SAME layer's DependencyProvider AS OF THIS COMMIT — grep the diff for any `add*` removal/move that breaks the chain. **Spryker container keys are NOT shared across layers** (Business / Communication / Client containers are separate); a method moved from Communication to Business breaks every Communication-layer factory still resolving its key.
+  2. **No-dev image safety.** Confirm the console's class file ships in the production image (i.e. NOT `require-dev` only, NOT under an `APPLICATION_ENV === 'development'` guard whose package isn't in `require`). Re-affirm the project CLAUDE.md `APPLICATION_ENV` gotcha.
+  3. **Post-deploy task realism.** For each post-deploy task: confirm `execute_on` includes `prod` (and `pipeline` where relevant); confirm `timeout` is realistic for un-batched per-row work (default 900s often too tight); confirm task ordering vs migration apply.
+- Output: per-command checklist with PASS / FAIL / UNKNOWN per step. Any FAIL ⇒ Critical (deploy-time crash or post-deploy data drift).
+
 ## Step 4: Validator pass (always run; serial after Step 3 completes)
 
 Spawn ONE more agent (`subagent_type: general-purpose`) that:
@@ -265,6 +289,10 @@ Spawn ONE more agent (`subagent_type: general-purpose`) that:
   - Communication-layer ORM findings where access actually goes through `getQueryContainer()`
   - Generated-constant references (`SpyXEntityTransfer::CONST`) the reviewer couldn't open
   - Dead-code findings where the caller is in a non-PHP file (twig, JS) the reviewer didn't grep
+- **Cross-pass synthesis checks** (mechanical; raise NEW findings if matched):
+  - **Runtime parity.** If Pass C2 found a backfill console / migration / post-deploy task that fixes a column or state, search Pass A/B findings for the matching runtime creation path. If no Pass A/B finding asserts the runtime path also sets it ⇒ raise a NEW Critical "one-shot fix without runtime parity" (e.g. `BackfillMerchantAclGroupFkMerchantConsole` exists, but runtime `AclEntityCreator::createAclEntitiesForMerchant` doesn't `setFkMerchant` — new merchants leak ACL).
+  - **DI consistency.** If Pass A flagged an `add*` removal/move in any DependencyProvider, confirm Pass G ran AND its container-key trace passed. If Pass G didn't run (trigger missed it) ⇒ run the trace yourself: grep all consumers of the moved key; if any consumer is in a different layer's factory ⇒ raise NEW Critical "container-key resolution broken across layers".
+  - **Invariant symmetry.** For every "missing X on creation path" finding (i.e. asymmetry surfaced by rule 8 Q1), check the symmetrical update / unassign / delete handlers in the same module. If any are also missing the X-handling ⇒ raise NEW Major per missing handler.
 - Returns adjustments: severity changes, false-positive list, plus any **new issues** spotted while validating.
 
 The validator's output is folded into the final synthesis. Disputed findings are kept but flagged.
@@ -294,7 +322,7 @@ ticket: ABC-123                       # or null
 commit: ef0d08c75
 branch: abc-123-feature-branch
 mode: full                            # full | light | hotspots-only
-passes_run: [A, B, C1, C2, D, E, F, validator]
+passes_run: [A, B, C1, C2, D, E, F, G, validator]
 verdict: block_merge                  # block_merge | proceed_with_caveats | clean
 counts_by_severity:
   critical: 7
