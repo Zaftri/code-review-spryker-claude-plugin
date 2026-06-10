@@ -155,7 +155,7 @@ Every dispatched agent MUST receive these as ground rules, in priority order:
    - For transfer fields: match each new XML `<property name="X">` against `getX`/`setX` in PHP
    - For schema columns: match each new `<column name="X">` against `filterByX`, `getX`, `setX` in repositories/entity managers
 
-8. **Pre-flight: two diff-level questions** — before applying any pattern-match rule (rules 1–7), every Pass A / B / D / G agent MUST enumerate the answers to these two questions about the diff and include both enumerations near the top of its response. Findings that surface from these enumerations outrank later pattern-match findings.
+8. **Pre-flight: diff-level questions** — before applying any pattern-match rule (rules 1–7), every Pass A / B / B' / D / G agent MUST enumerate the answers to the questions below that apply to its scope, and include those enumerations near the top of its response. Findings that surface from these enumerations outrank later pattern-match findings.
 
    **Q1 — What invariants does this diff assert?**
    List every "must hold" property the diff introduces or relies on: uniqueness ("at most one X per Y"), totality ("every Y has at least one X"), default-presence ("every Y has exactly one X with `flag=true`"), referential ("every X.fk_y resolves"), monotonicity, conservation, **first-pick determinism** (any `findOne` / `reset()` / `[0]` over a multi-row source needs an ordering whose key is unique on the result set). For each invariant, enumerate every code path that **writes** the affected state. Then prove each writer establishes or preserves the invariant. Asymmetry across writers (e.g. update path sets the flag, create path doesn't) ⇒ Critical.
@@ -163,7 +163,19 @@ Every dispatched agent MUST receive these as ground rules, in priority order:
    **Q2 — What identifiers does this diff remove, rename, or relocate?**
    List every removed / renamed / moved DI key, method, transfer field, schema column, plugin registration, route, container key, or default-value contract (this includes *implicit* removal — e.g. a partial DTO whose `toArray()` emits absent fields as `null`, deleting them on the deserialiser side). For each, grep all consumers in scope plus parent classes / inherited factories. Any consumer not explicitly updated ⇒ Critical (broken contract).
 
-   These two questions are framework-agnostic; Spryker-specific instances (DI container-layer separation, `AbstractTransfer::toArray()` null-emission, partial-unique-index workarounds, backfill-vs-runtime parity) are *examples* of the questions, not separate rules. If a Spryker-specific instance is the dominant risk in this diff, name it explicitly under the relevant question.
+   **Q3 — What value does this diff render in more than one place?**
+   List every value the diff transforms for output where another code path already transforms the *same source value* for a different sink (table cell ↔ export row, list ↔ detail, UI ↔ API response, read model ↔ write model, two formatters of one quantity). For each, enumerate the full transform the existing sink applies — lookup/mapping, formatting, rounding, flag-gated remap, escaping, fallback default — and prove the new sink applies the same set, or diverges for a stated reason. Silent divergence ⇒ the new output contradicts what the user already sees ⇒ Major (Critical if the two are shown side by side, or one is claimed to mirror the other). A new sink copied from an *older* revision of the existing one is the usual origin — diff the branches, not just the method names.
+
+   **Q4 — Where does data cross a format boundary?**
+   List every point where a value crosses into a different format, language, or process: URL / query string, HTML, CSV / spreadsheet cell, SQL, shell, JSON, regex, log line, filename / path. For each, confirm the value is encoded with the encoder for *that exact target* — not a looser superset (e.g. whole-URL vs single-component encoders) — and that any leading character the sink interprets is neutralised (spreadsheet formula triggers, control / format chars, path traversal). A missing or over-broad encoder ⇒ corruption (wrong data, silently) or injection. Severity by sink and source trust.
+
+   **Q5 — What does this diff acquire that must later be released?**
+   List every long-lived resource the diff opens: subscription / observable, event or DOM listener, timer / interval, file or network handle, DB cursor, lock, registered callback. For each, prove a symmetric release exists on the owner's teardown path (destroy / unsubscribe / close / `finally`) and that the release runs on *every* exit, including error paths. An acquire with no matching release ⇒ leak (Major); released only on the happy path ⇒ Major.
+
+   **Q6 — What in this diff can fail or run unboundedly, and how is that observed?**
+   For every operation that can fail or stream an unbounded result: (a) confirm it is launched through a channel that can *observe* the outcome — a fire-and-forget trigger that structurally cannot read an error (navigation-style download, detached request) hides failures; (b) confirm user-visible progress / done / error state is bound to the *actual* result, not a fixed timer or optimistic assumption; (c) for streamed or paged output, confirm incremental flushing, a timeout budget covering *every* layer (app + proxy / web server), and that all validation able to fail runs *before* the first byte is committed — once headers / BOM are sent, a mid-stream guard cannot surface. Every guard or error branch the diff adds here must have a test that triggers it (feeds Pass E).
+
+   These questions are framework-agnostic; concrete instances are *examples*, not separate rules — Q1: DI container-layer separation, `AbstractTransfer::toArray()` null-emission, partial-unique-index workarounds, backfill-vs-runtime parity; Q2: removed DI keys / transfer fields / plugin registrations; Q3: table-cell vs export-cell parity under a feature flag; Q4: `encodeURIComponent` for query params, CSV formula-injection neutralisation; Q5: Observable / `takeUntilDestroyed` teardown, event-listener cleanup on widget destroy; Q6: `StreamedResponse` flush + proxy timeout budget, HTTP-status-aware download. If a concrete instance is the dominant risk in this diff, name it explicitly under the relevant question.
 
 ## Step 3: Dispatch review passes (parallel Agent calls)
 
@@ -215,6 +227,12 @@ Each agent prompt MUST:
   - **Dead code & unused artifacts** per Step 2 rule 7 — explicitly run translation cross-reference and Facade-caller grep
   - **Project style** — visibility, native types on constants, magic numbers, comments restating code, line length > 120, interface scope
 - For frontend changes < ~200 LOC, also includes JS/TS/SCSS smells (magic numbers, missing `*.constant.ts`, inline HTML in PHP). Heavier frontend goes to Pass B'.
+- **Style sweep is mandatory and runs LAST, after the Q1–Q6 enumeration — never skipped because the diff "looks clean."** The pre-flight questions surface high-severity bugs and tend to crowd out low-severity checklist items; counter this mechanically. For every file in scope, enumerate each *new or edited* declaration and check it against the project Code Style list, reporting Nit-level misses even when Q-findings dominate the diff:
+  - every new `const` → has a native type (`private const string FOO`), not bare `private const FOO`
+  - every numeric/string literal in logic → extracted to a constant / `*.constant.ts`
+  - every new method/property/const → least possible visibility
+  - lines > 120 chars; comments that merely restate the code
+  If a style item has zero misses, say so in one line; do not silently omit the sweep. (Origin note: in eval, untyped-constant misses were the single class the Q-questions failed to catch — this bullet exists to close that gap.)
 
 ### Pass B' — Frontend (only when frontend hotspot per Step 1.4)
 - `subagent_type: frontend-architect`
@@ -252,6 +270,7 @@ Each agent prompt MUST:
     2. List every **invariant** the column carries (e.g. "every active user has exactly one `is_default=true` row")
     3. For each (write-path × invariant), assert a test exists that exercises the path AND asserts the invariant holds afterwards
     If no test exists ⇒ flag with sev=Major (untested state transition), even if the production code looks correct. Subsumes the older "every Critical/Major finding has a test" check.
+  - **Guard-path coverage**: every defensive guard the diff ADDS — a `throw`, early-return, or error branch whose job is to protect an invariant or prevent a corrupt / truncated / partial result — must have a test that *triggers* it. Guards are the highest-value, least-covered code: the happy path exercises everything except them. Guard present but no test that drives it down the failure branch ⇒ Major.
   - **Pyramid balance**: too many slow Acceptance tests vs missing Unit tests
   - **Edge cases**: nulls, empty collections, boundary values, error paths, concurrent writes (where relevant)
   - **Snapshot/contract tests** for new public Facade methods
