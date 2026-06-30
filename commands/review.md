@@ -165,6 +165,15 @@ Every dispatched agent MUST receive these as ground rules, in priority order:
 
    These two questions are framework-agnostic; Spryker-specific instances (DI container-layer separation, `AbstractTransfer::toArray()` null-emission, partial-unique-index workarounds, backfill-vs-runtime parity) are *examples* of the questions, not separate rules. If a Spryker-specific instance is the dominant risk in this diff, name it explicitly under the relevant question.
 
+9. **Spryker idiom & convention checks** — deterministic, grep-detectable conventions that human Spryker reviewers reliably flag and authors reliably fix. These are usually Minor/Nit but are **exempt from the Step 3 signal-budget cap and the "drop lowest-severity" rule** (see Step 3) — report *every* instance, because they are cheap to detect and cheap to fix, and missing them is exactly how a review loses credibility vs. a human reviewer. Each is owned by the pass noted; see `spryker-conventions` skill for the rationale.
+
+   - **9a — `@api` annotation at Pyz (Pass A/F).** `@api` is a Spryker **Core** marker for a module's published public API. Pyz application interfaces (`src/Pyz/**Interface.php`) are not Core public API — flag any **added** `@api` docblock tag in a `src/Pyz/**` interface/class and recommend removal. Detect: `git diff <range> -- 'src/Pyz/**Interface.php' | grep -nE '^\+.*@api'`. Report **all** occurrences (the human comment "remove here and in N more places" is one finding per site).
+   - **9b — Mapping logic belongs in a Mapper (Pass A/B).** Inline transfer→transfer / array→transfer / entity→transfer mapping (≥~3 lines, or ≥2 such methods) inside an Expander / Controller / Resolver / Hydrator / Reader → flag "extract to a dedicated `*Mapper`" (not a generic "builder"/"helper" — name the Spryker **Mapper** pattern). One finding per method that should move.
+   - **9c — Exceptions are not control flow (Pass A/B).** In Zed, flag `throw`/`...OrFail()` used to signal an **expected** "not found / empty" outcome, and any `try { } catch (\Exception ...)` that downgrades a thrown exception into a default/empty return. Spryker handles exceptions in a central handler and they must not steer the workflow. Cite https://docs.spryker.com/docs/dg/dev/backend-development/zed/business-layer/custom-exceptions. Prefer a nullable return / explicit "exists" check over throw-then-catch.
+   - **9d — Test-support placement (Pass E).** In `tests/PyzTest/**`, flag any non-test code (fixture builders, data-setup helpers, factory wiring, `have*`/`create*` helpers) living in the test case itself — it belongs in the Codeception **Tester** / Helper / `_support` class. One finding per misplaced helper block.
+   - **9e — One-shot data fix simplicity (Pass A/B/C2).** When a backfill **console + a new Facade/EntityManager method** is added solely for a one-time data migration, raise a YAGNI question: could it be the migration's `postUp()` (or at least a thin console without a dedicated facade method)? Flag the speculative public-API surface created for a throwaway task.
+   - **9f — Systematic least-visibility sweep (Pass A/B).** This is a *complete enumeration*, not a spot-check. For **every** method and factory `createX`/`getX` added or changed in the diff, grep callers across `src/` and `tests/` (`grep -rn '->methodName\|::methodName'`). No caller outside the declaring class ⇒ recommend `private`; callers only within the same module ⇒ recommend `protected`; `public` only if an external caller exists. Report every method whose declared visibility is wider than its actual usage.
+
 ## Step 3: Dispatch review passes (parallel Agent calls)
 
 Use the **Agent** tool. Send all independent passes in a SINGLE message with multiple tool calls.
@@ -193,19 +202,21 @@ Use the **Agent** tool. Send all independent passes in a SINGLE message with mul
 
 Each agent prompt MUST:
 - State the goal and the specific files in scope (don't make them re-discover).
-- Include the Step 2 rule sheet inline.
+- Include the Step 2 rule sheet inline. For Pass A/B/E, include the relevant **rule-9 idiom checks verbatim** and the grep commands — these are the findings most often missed, and they must be passed explicitly, not summarized away.
 - Demand findings as `severity | file:line | primary rule | what's wrong | suggested fix`. List secondary rules in parentheses if relevant (e.g. `SoC (also: KISS, SRP)`); pick **one primary rule** per finding to avoid triple-counting.
 - For security findings: include a Given/When/Then attack scenario.
 - **Signal budget — strict:**
   - Only include findings that would change code or shipping decisions. Drop pure preference, drop "smell-only" with no concrete fix.
   - Cap each pass at **30 substantive findings**. If you would exceed 30, drop the lowest-severity items and note "N additional Nit-level items omitted for signal" at the end.
-  - Severity discipline: Critical = blocks merge; Major = fix before merge or open follow-up; Minor = fix opportunistically; Nit = preference. If unsure, drop a tier.
+  - **Exception — Spryker idiom & convention checks (rule 9) are NEVER dropped.** They are deterministic, grep-detectable, and reliably flagged by human reviewers; report every instance even if Minor/Nit and even past the 30-finding cap (list them in a separate "Convention" block so they don't crowd out judgment-based findings). The cap and "drop lowest tier" apply only to judgment-based smells, not to rule-9 violations.
+  - Severity discipline: Critical = blocks merge; Major = fix before merge or open follow-up; Minor = fix opportunistically; Nit = preference. If unsure, drop a tier (except rule-9 items, which are reported regardless).
 - Cap response length (~400-600 words per agent).
 - **Forbid edits** — review only. Agents must NOT use Write/Edit tools.
 
 ### Pass A — Architectural / Spryker conformance
 - `subagent_type: general-purpose`
 - Scope: layer boundaries, facade-only cross-module access (per Bridge nuance in rule 2), factory conventions (`createX` protected/private, `getX` for cached deps), dependency provider correctness (constants, late-bound closures, plugin stacks), transfer object usage vs raw arrays, persistence isolated to `Persistence/`, no business logic in plugins/controllers, module public vs private API, Propel schema changes paired with migrations.
+- **Also run rule-9 idiom checks (report all, exempt from cap):** 9a (`@api` removed from `src/Pyz/**` interfaces), 9c (exceptions not used as control flow in Zed), 9e (one-shot fix over-engineering), 9f (systematic least-visibility sweep over every added/changed method — do NOT spot-check). 9b (mapping → Mapper) is shared with Pass B.
 - Must use context7 `/spryker/spryker-docs` to verify any rule before citing it.
 
 ### Pass B — Code quality (SOLID / DRY / YAGNI / KISS / TDA / SoC / dead code / project style)
@@ -214,6 +225,7 @@ Each agent prompt MUST:
   - **SOLID / DRY / YAGNI / KISS / TDA / SoC** per Step 2 rules 3–6
   - **Dead code & unused artifacts** per Step 2 rule 7 — explicitly run translation cross-reference and Facade-caller grep
   - **Project style** — visibility, native types on constants, magic numbers, comments restating code, line length > 120, interface scope
+  - **Rule-9 idiom checks (report all, exempt from cap):** 9b (inline mapping → extract a `*Mapper`), 9e (one-shot console+facade that could be migration `postUp`), and contribute to 9f (least-visibility) alongside Pass A.
 - For frontend changes < ~200 LOC, also includes JS/TS/SCSS smells (magic numbers, missing `*.constant.ts`, inline HTML in PHP). Heavier frontend goes to Pass B'.
 
 ### Pass B' — Frontend (only when frontend hotspot per Step 1.4)
@@ -256,6 +268,7 @@ Each agent prompt MUST:
   - **Edge cases**: nulls, empty collections, boundary values, error paths, concurrent writes (where relevant)
   - **Snapshot/contract tests** for new public Facade methods
   - **Static cache contamination** patterns (per CLAUDE.md "Test Splitting" section): `_before()` clearing, `StaticCacheHelper` usage where shared static state exists
+  - **Rule-9d — test-support placement (report all, exempt from cap):** flag non-test code in the test case (fixture builders, data setup, `have*`/`create*` helpers, factory wiring) that belongs in the Codeception Tester / Helper / `_support` class.
   - Open the actual test files; spot-check assertions; don't trust file presence alone.
 
 ### Pass F — Public API / contract changes (only when diff touches `*FacadeInterface.php`, `*PluginInterface.php`, `*.transfer.xml`, or GLUE API resources)
@@ -293,6 +306,7 @@ Spawn ONE more agent (`subagent_type: general-purpose`) that:
   - **Runtime parity.** If Pass C2 found a backfill console / migration / post-deploy task that fixes a column or state, search Pass A/B findings for the matching runtime creation path. If no Pass A/B finding asserts the runtime path also sets it ⇒ raise a NEW Critical "one-shot fix without runtime parity" (e.g. `BackfillMerchantAclGroupFkMerchantConsole` exists, but runtime `AclEntityCreator::createAclEntitiesForMerchant` doesn't `setFkMerchant` — new merchants leak ACL).
   - **DI consistency.** If Pass A flagged an `add*` removal/move in any DependencyProvider, confirm Pass G ran AND its container-key trace passed. If Pass G didn't run (trigger missed it) ⇒ run the trace yourself: grep all consumers of the moved key; if any consumer is in a different layer's factory ⇒ raise NEW Critical "container-key resolution broken across layers".
   - **Invariant symmetry.** For every "missing X on creation path" finding (i.e. asymmetry surfaced by rule 8 Q1), check the symmetrical update / unassign / delete handlers in the same module. If any are also missing the X-handling ⇒ raise NEW Major per missing handler.
+  - **Rule-9 completeness.** Confirm the idiom sweep was actually exhaustive, since it's the class of finding most often missed by spot-checking: (a) for every interface/class added under `src/Pyz/**`, was an `@api` verdict rendered (9a)? (b) for every method/factory accessor added or changed in the diff, was a visibility verdict rendered (9f)? (c) was every Expander/Resolver/Controller with inline mapping checked for 9b? If any were skipped, run the grep yourself and raise the missing findings (Minor/Nit, but raise them all).
 - Returns adjustments: severity changes, false-positive list, plus any **new issues** spotted while validating.
 
 The validator's output is folded into the final synthesis. Disputed findings are kept but flagged.

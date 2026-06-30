@@ -88,6 +88,39 @@ public function getCalculationFacade(): CartToCalculationInterface
 - `getX()` — returns a cached/shared dependency from `$this->getProvidedDependency()`. Typically `public` only when the facade or its caller needs it; otherwise `protected`.
 - The facade uses `$this->getFactory()->createX()->doWork()` for business logic, not `getX()` for build-block components.
 
+## Least visibility — verify, don't assume (recurring reviewer comment)
+
+Reviewers reliably flag methods declared wider than their actual usage ("make it private if not used anywhere else"). The check is mechanical and must be **exhaustive**, not spot-checked: for every method / factory accessor added or changed, grep callers across `src/` + `tests/` (`grep -rn '->methodName\|::methodName'`).
+
+- No caller outside the declaring class ⇒ `private`.
+- Callers only within the same module ⇒ `protected`.
+- `public` only when an external caller (another module, the facade's public surface, a controller via `getFactory()`) genuinely exists.
+
+A method called only by `getFactory()->createX()` from within the same module's controller still needs only `protected` (a factory accessor resolves on protected).
+
+## `@api` annotation is a Core marker — not for Pyz
+
+The `@api` docblock tag designates a Spryker **Core** module's *published* public API (the contract Core promises downstream projects). **Pyz application code does not publish a module API**, so `@api` tags do not belong on `src/Pyz/**` interfaces or classes. Adding `@api` to a Pyz `*Interface.php` is a convention violation — recommend removal (and check sibling interfaces in the same MR: the same paste often spreads it to several files).
+
+## Mapping logic belongs in a Mapper
+
+Transfer→transfer, array→transfer, and entity→transfer mapping is its own responsibility and belongs in a dedicated `*Mapper` class (`map<Source>To<Target>(...)`), not inlined in an Expander / Resolver / Controller / Hydrator / Reader. When you see ≥~3 lines of field-copying, or two or more `map*`/`extract*` private methods accreting on a non-mapper class, the fix is "extract to a `*Mapper`" — name the Spryker **Mapper** pattern specifically (not a generic "builder"/"helper"/"view object").
+
+## Exceptions are not control flow (Zed)
+
+Per https://docs.spryker.com/docs/dg/dev/backend-development/zed/business-layer/custom-exceptions — Spryker handles exceptions and errors in a central handler that does not stop execution. **Do not use exceptions as events to steer the workflow.**
+
+- An *expected* "not found / nothing to do / empty result" is **not** exceptional — return a nullable / empty transfer or expose an explicit `has*`/`exists*` check; don't `throw` (or `...OrFail()`) and catch.
+- A `try { ... } catch (\Exception $e) { log; return new XTransfer(); }` that converts any failure into an empty/default return is an anti-pattern: it both uses exceptions for flow and swallows genuine errors into an indistinguishable "not found". Narrow the catch, or let the facade return a typed empty result without throwing.
+
+## Test-support code belongs in the Tester
+
+In Codeception (`tests/PyzTest/**`), the test case asserts behavior; everything else — fixture builders, data setup, `have*`/`create*` helpers, factory/mock wiring reused across cases — belongs in the module's **Tester** actor (`_support`) or a Helper. Non-test helper methods accreting inside the test class itself are a convention violation ("move everything that is not a test to tester").
+
+## One-shot data fixes — prefer the simplest vehicle
+
+A one-time data backfill does not automatically justify a new public Facade/EntityManager method plus a Console command. Before adding that surface, ask whether the fix belongs in the migration's `postUp()` (runs once, in order, no lasting API), or at most a thin console without a dedicated facade method. Reserve the console+facade route for work that is genuinely re-runnable, needs business logic, or must be invoked outside the migration lifecycle. A throwaway public method on a Facade is speculative API surface (YAGNI).
+
 ## DependencyProvider conventions
 
 - Constants for every dep: `FACADE_*`, `SERVICE_*`, `PLUGINS_*`, `QUERY_CONTAINER_*`.
