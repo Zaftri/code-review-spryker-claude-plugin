@@ -1,0 +1,4 @@
+# Claude Code writes per-session lock markers into the installed plugin directory.
+# This repo IS the installed plugin (the plugin cache path is a symlink to it),
+# so those markers land here. They are runtime state, never source.
+.in_use/

@@ -162,6 +162,28 @@ The command reads `./.claude/CLAUDE.md` from the project being reviewed. Put pro
 
 If `./.claude/CLAUDE.md` is missing, the review proceeds with Spryker conventions only and notes "no project rule sheet found" in the synthesis.
 
+## Local development — single-copy setup
+
+By default Claude Code installs a plugin by cloning it into `~/.claude/plugins/cache/...`, which leaves you editing one copy and running another. To iterate on the rule sheet without hand-syncing, this repo is registered as a **local directory marketplace** that points its plugin at itself, and the cache path is symlinked back here:
+
+```bash
+# .claude-plugin/marketplace.json declares:  "source": "./"
+claude plugin marketplace add /path/to/spryker-review-plugin
+claude plugin install spryker-review@code-review-spryker-claude-plugin
+
+# then replace the cache copy with a symlink to this repo
+CACHE="$HOME/.claude/plugins/cache/code-review-spryker-claude-plugin/spryker-review/1.0.0"
+rm -rf "$CACHE" && ln -s /path/to/spryker-review-plugin "$CACHE"
+```
+
+Verify with `claude plugin details spryker-review` — it should list 3 skills (`review`, `learn`, `spryker-conventions`). Edits land on the next session, since skills load at startup.
+
+**Two gotchas:**
+- The plugin cache is version-keyed, so `claude plugin update` no-ops while `version` is unchanged. Don't rely on it to pick up edits — just restart.
+- A `claude plugin uninstall` / `install` cycle replaces the symlink with a real directory, silently restoring the two-copy problem. Re-run the `ln -s` above if that happens. `/spryker-review:learn` checks this invariant on every run.
+
+Claude Code writes `.in_use/<pid>` session markers into the installed plugin directory — i.e. into this repo. They're gitignored.
+
 ## License
 
 MIT

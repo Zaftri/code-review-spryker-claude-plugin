@@ -1,15 +1,13 @@
 {
   "name": "code-review-spryker-claude-plugin",
+  "description": "Spryker code-review tooling: a multi-pass thoughtful review command and a feedback-learning command that hardens its own rule sheet.",
   "owner": {
     "name": "Sebastian Wasiewicz"
   },
   "plugins": [
     {
       "name": "spryker-review",
-      "source": {
-        "source": "github",
-        "repo": "Zaftri/code-review-spryker-claude-plugin"
-      },
+      "source": "./",
       "description": "Multi-pass thoughtful code review for Spryker projects: SOLID, DRY, YAGNI, KISS, TDA, SoC, performance, tests, contracts, dead-code, security, deploy safety. Read-only.",
       "version": "1.0.0",
       "category": "code-review",

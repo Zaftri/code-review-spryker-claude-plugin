@@ -1,0 +1,863 @@
+--- a/data/translation/Zed/SalesMerchantPortalGui/de_CH.csv
++++ b/data/translation/Zed/SalesMerchantPortalGui/de_CH.csv
+@@ -27,6 +27,9 @@ sales_merchant_portal_gui.order_details.customer_number,Kundennummer
+ sales_merchant_portal_gui.order_details.customer_email,"E-Mail Besteller"
+ sales_merchant_portal_gui.order_details.included_fees,"Inkl. Gebühren"
+ sales_merchant_portal_gui.order_details.included_taxes,"Inkl. MwSt."
++sales_merchant_portal_gui.order_details.mercanto_fee,"Inkl. Mercanto-Gebühr"
++sales_merchant_portal_gui.order_details.deposit,"Depot"
++sales_merchant_portal_gui.order_details.deposit_item_label,"Depot"
+ sales_merchant_portal_gui.order_details.download_csv_button,"Als CSV-Datei herunterladen"
+ sales_merchant_portal_gui.order_details.download_json_button,"Als JSON-Datei herunterladen"
+ sales_merchant_portal_gui.order_items.item_details,Artikel ansehen
+@@ -38,6 +41,7 @@ sales_merchant_portal_gui.order_item.packaging_unit,Einheit
+ sales_merchant_portal_gui.order_item.price,Preis CHF
+ sales_merchant_portal_gui.order_item.quantity,Menge
+ sales_merchant_portal_gui.order_item.total,Summe CHF
++sales_merchant_portal_gui.order_item.deposit,"Depot"
+ sales_merchant_portal_gui.order_item.delivery_date,Lieferdatum
+ sales_merchant_portal_gui.order_item.state,Status
+ sales_merchant_portal_gui.order.not_found,"Die Bestellung mit der ID ""%order_id%"" wurde nicht gefunden."
+
+--- a/data/translation/Zed/SalesMerchantPortalGui/en_GB.csv
++++ b/data/translation/Zed/SalesMerchantPortalGui/en_GB.csv
+@@ -27,6 +27,9 @@ sales_merchant_portal_gui.order_details.customer_number,"Customer number"
+ sales_merchant_portal_gui.order_details.customer_email,"Customer email"
+ sales_merchant_portal_gui.order_details.included_fees,"Fees incl."
+ sales_merchant_portal_gui.order_details.included_taxes,"VAT incl."
++sales_merchant_portal_gui.order_details.mercanto_fee,"Mercanto fee incl."
++sales_merchant_portal_gui.order_details.deposit,"Deposit"
++sales_merchant_portal_gui.order_details.deposit_item_label,"deposit"
+ sales_merchant_portal_gui.order_details.download_csv_button,"Download as CSV"
+ sales_merchant_portal_gui.order_details.download_json_button,"Download as JSON"
+ sales_merchant_portal_gui.order_items.item_details,"View item"
+@@ -38,6 +41,7 @@ sales_merchant_portal_gui.order_item.packaging_unit,"Unit"
+ sales_merchant_portal_gui.order_item.price,"Price CHF"
+ sales_merchant_portal_gui.order_item.quantity,"Quantity"
+ sales_merchant_portal_gui.order_item.total,"Total CHF"
++sales_merchant_portal_gui.order_item.deposit,"Deposit"
+ sales_merchant_portal_gui.order_item.delivery_date,"Delivery date"
+ sales_merchant_portal_gui.order_item.state,"Status"
+ sales_merchant_portal_gui.order.not_found,"Order with ID ""%order_id%"" was not found."
+
+--- a/data/translation/Zed/SalesMerchantPortalGui/fr_CH.csv
++++ b/data/translation/Zed/SalesMerchantPortalGui/fr_CH.csv
+@@ -27,6 +27,9 @@ sales_merchant_portal_gui.order_details.customer_number,Numéro de client
+ sales_merchant_portal_gui.order_details.customer_email,"E-mail de l'acheteur"
+ sales_merchant_portal_gui.order_details.included_fees,"Frais incl."
+ sales_merchant_portal_gui.order_details.included_taxes,"TVA incl."
++sales_merchant_portal_gui.order_details.mercanto_fee,"Frais Mercanto incl."
++sales_merchant_portal_gui.order_details.deposit,"Consigne"
++sales_merchant_portal_gui.order_details.deposit_item_label,"consigne"
+ sales_merchant_portal_gui.order_details.download_csv_button,"Télécharger au format CSV"
+ sales_merchant_portal_gui.order_details.download_json_button,"Télécharger au format JSON"
+ sales_merchant_portal_gui.order_items.item_details,Voir l'article
+@@ -38,6 +41,7 @@ sales_merchant_portal_gui.order_item.packaging_unit,Unité
+ sales_merchant_portal_gui.order_item.price,Prix CHF
+ sales_merchant_portal_gui.order_item.quantity,Quantité
+ sales_merchant_portal_gui.order_item.total,Total CHF
++sales_merchant_portal_gui.order_item.deposit,"Consigne"
+ sales_merchant_portal_gui.order_item.delivery_date,Date de livraison
+ sales_merchant_portal_gui.order_item.state,Statut
+ sales_merchant_portal_gui.order.not_found,"La commande avec l'ID ""%order_id%"" n'a pas été trouvée."
+
+--- a/data/translation/Zed/SalesMerchantPortalGui/it_CH.csv
++++ b/data/translation/Zed/SalesMerchantPortalGui/it_CH.csv
+@@ -27,6 +27,9 @@ sales_merchant_portal_gui.order_details.customer_number,"Numero cliente"
+ sales_merchant_portal_gui.order_details.customer_email,"E-mail del cliente"
+ sales_merchant_portal_gui.order_details.included_fees,"Spese incl."
+ sales_merchant_portal_gui.order_details.included_taxes,"IVA incl."
++sales_merchant_portal_gui.order_details.mercanto_fee,"Tassa Mercanto incl."
++sales_merchant_portal_gui.order_details.deposit,"Deposito"
++sales_merchant_portal_gui.order_details.deposit_item_label,"deposito"
+ sales_merchant_portal_gui.order_details.download_csv_button,"Scarica come CSV"
+ sales_merchant_portal_gui.order_details.download_json_button,"Scarica come JSON"
+ sales_merchant_portal_gui.order_items.item_details,"Visualizza articolo"
+@@ -38,6 +41,7 @@ sales_merchant_portal_gui.order_item.packaging_unit,"Unità"
+ sales_merchant_portal_gui.order_item.price,"Prezzo CHF"
+ sales_merchant_portal_gui.order_item.quantity,"Quantità"
+ sales_merchant_portal_gui.order_item.total,"Totale CHF"
++sales_merchant_portal_gui.order_item.deposit,"Deposito"
+ sales_merchant_portal_gui.order_item.delivery_date,"Data di consegna"
+ sales_merchant_portal_gui.order_item.state,"Stato"
+ sales_merchant_portal_gui.order.not_found,"L'ordine con ID ""%order_id%"" non è stato trovato."
+
+--- a/src/Orm/Propel/DE/Migration_pgsql/PropelMigration_1784706023.php
++++ b/src/Orm/Propel/DE/Migration_pgsql/PropelMigration_1784706023.php
+@@ -0,0 +1,106 @@
++<?php
++use Propel\Generator\Manager\MigrationManager;
++
++/**
++ * Data object containing the SQL and PHP code to migrate the database
++ * up to version 1784706023.
++ * Generated on 2026-07-22 09:40:23 by root */
++class PropelMigration_1784706023{
++    /**
++     * @var string
++     */
++    public $comment = '';
++
++    /**
++     * @param \Propel\Generator\Manager\MigrationManager $manager
++     *
++     * @return null|false|void
++     */
++    public function preUp(MigrationManager $manager)
++    {
++        // add the pre-migration code here
++    }
++
++    /**
++     * @param \Propel\Generator\Manager\MigrationManager $manager
++     *
++     * @return null|false|void
++     */
++    public function postUp(MigrationManager $manager)
++    {
++        // add the post-migration code here
++    }
++
++    /**
++     * @param \Propel\Generator\Manager\MigrationManager $manager
++     *
++     * @return null|false|void
++     */
++    public function preDown(MigrationManager $manager)
++    {
++        // add the pre-migration code here
++    }
++
++    /**
++     * @param \Propel\Generator\Manager\MigrationManager $manager
++     *
++     * @return null|false|void
++     */
++    public function postDown(MigrationManager $manager)
++    {
++        // add the post-migration code here
++    }
++
++    /**
++     * Get the SQL statements for the Up migration
++     *
++     * @return array list of the SQL strings to execute for the Up migration
++     *               the keys being the datasources
++     */
++    public function getUpSQL(): array
++    {
++        $connection_zed = <<< 'EOT'
++
++BEGIN;
++
++ALTER TABLE "spy_merchant_sales_order_totals"
++
++  ADD "deposit_total" INT8 DEFAULT 0,
++
++  ADD "mercanto_fee_total" INT8 DEFAULT 0;
++
++COMMIT;
++EOT;
++
++        return [
++            'zed' => $connection_zed,
++        ];
++    }
++
++    /**
++     * Get the SQL statements for the Down migration
++     *
++     * @return array list of the SQL strings to execute for the Down migration
++     *               the keys being the datasources
++     */
++    public function getDownSQL(): array
++    {
++        $connection_zed = <<< 'EOT'
++
++BEGIN;
++
++ALTER TABLE "spy_merchant_sales_order_totals"
++
++  DROP COLUMN "deposit_total",
++
++  DROP COLUMN "mercanto_fee_total";
++
++COMMIT;
++EOT;
++
++        return [
++            'zed' => $connection_zed,
++        ];
++    }
++
++}
+
+--- a/src/Pyz/Service/ProductDeposit/ProductDepositService.php
++++ b/src/Pyz/Service/ProductDeposit/ProductDepositService.php
+@@ -10,6 +10,7 @@ declare(strict_types=1);
+ namespace Pyz\Service\ProductDeposit;
+ 
+ use Generated\Shared\Transfer\ItemTransfer;
++use Generated\Shared\Transfer\ProductDepositLabelTransfer;
+ use Spryker\Service\Kernel\AbstractService;
+ 
+ /**
+@@ -26,4 +27,21 @@ class ProductDepositService extends AbstractService implements ProductDepositSer
+     {
+         return $this->getFactory()->createProductDepositCalculator()->calculateItemDepositTotal($itemTransfer);
+     }
++
++    /**
++     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
++     *
++     * @return int
++     */
++    public function calculateItemDepositTotalFromMetadata(ItemTransfer $itemTransfer): int
++    {
++        if ($itemTransfer->getDeposits()->count() === 0) {
++            $itemAttributes = $itemTransfer->getMetadata()?->getItemAttributes() ?? [];
++            foreach ($itemAttributes[ItemTransfer::DEPOSITS] ?? [] as $deposit) {
++                $itemTransfer->addDeposit((new ProductDepositLabelTransfer())->fromArray($deposit, true));
++            }
++        }
++
++        return $this->calculateItemDepositTotal($itemTransfer);
++    }
+ }
+
+--- a/src/Pyz/Service/ProductDeposit/ProductDepositServiceInterface.php
++++ b/src/Pyz/Service/ProductDeposit/ProductDepositServiceInterface.php
+@@ -19,4 +19,11 @@ interface ProductDepositServiceInterface
+      * @return int
+      */
+     public function calculateItemDepositTotal(ItemTransfer $itemTransfer): int;
++
++    /**
++     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
++     *
++     * @return int
++     */
++    public function calculateItemDepositTotalFromMetadata(ItemTransfer $itemTransfer): int;
+ }
+
+--- a/src/Pyz/Shared/FeatureFlag/FeatureFlags.php
++++ b/src/Pyz/Shared/FeatureFlag/FeatureFlags.php
+@@ -73,6 +73,7 @@ interface FeatureFlags
+         self::FEATURE_MD_4809_MERCHANT_IMPORT_NEW_SCHEMA => false,
+         self::FEATURE_BRD_17522_KEYWORDS_IN_FULL_TEXT => false,
+         self::FEATURE_BRD_17522_FULL_TEXT_DIS_MAX => false,
++        self::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE => false,
+     ];
+ 
+     public const array ZED_MENUS_BY_FEATURE_FLAG = [
+@@ -194,4 +195,6 @@ interface FeatureFlags
+     public const string FEATURE_BRD_17522_KEYWORDS_IN_FULL_TEXT = 'brd_17522_keywords_in_full_text';
+ 
+     public const string FEATURE_BRD_17522_FULL_TEXT_DIS_MAX = 'brd_17522_full_text_dis_max';
++
++    public const string FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE = 'md_2505_display_deposit_and_mercanto_fee';
+ }
+
+--- a/src/Pyz/Zed/MerchantSalesOrder/Persistence/Propel/Schema/spy_merchant_sales_order.schema.xml
++++ b/src/Pyz/Zed/MerchantSalesOrder/Persistence/Propel/Schema/spy_merchant_sales_order.schema.xml
+@@ -28,6 +28,8 @@
+         <column name="refund_total" type="BIGINT" required="false" default="0"/>
+         <column name="canceled_total" type="BIGINT" required="false" default="0"/>
+         <column name="tax_total" type="BIGINT" required="false" default="0"/>
++        <column name="mercanto_fee_total" type="BIGINT" required="false" default="0"/>
++        <column name="deposit_total" type="BIGINT" required="false" default="0"/>
+     </table>
+ 
+ </database>
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Communication/ConfigurationProvider/MerchantOrderItemGuiTableConfigurationProvider.php
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Communication/ConfigurationProvider/MerchantOrderItemGuiTableConfigurationProvider.php
+@@ -9,39 +9,47 @@ namespace Pyz\Zed\SalesMerchantPortalGui\Communication\ConfigurationProvider;
+ 
+ use Generated\Shared\Transfer\GuiTableConfigurationTransfer;
+ use Generated\Shared\Transfer\MerchantOrderTransfer;
++use Pyz\Shared\FeatureFlag\FeatureFlags;
++use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Spryker\Shared\GuiTable\Configuration\Builder\GuiTableConfigurationBuilderInterface;
+ use Spryker\Shared\GuiTable\GuiTableFactoryInterface;
+ use Spryker\Zed\SalesMerchantPortalGui\Communication\ConfigurationProvider\MerchantOrderItemGuiTableConfigurationProvider as SprykerMerchantOrderItemGuiTableConfigurationProvider;
+ 
+ class MerchantOrderItemGuiTableConfigurationProvider extends SprykerMerchantOrderItemGuiTableConfigurationProvider
+ {
+-    public const COL_KEY_MERCHANT_SKU = 'merchant_sku';
++    use FeatureFlagAwareTrait;
+ 
+-    public const COL_KEY_PACKAGING_UNIT = 'packaging_unit';
++    public const string COL_KEY_MERCHANT_SKU = 'merchant_sku';
+ 
+-    public const COL_KEY_PRICE = 'price';
++    public const string COL_KEY_PACKAGING_UNIT = 'packaging_unit';
+ 
+-    public const COL_KEY_TOTAL = 'total';
++    public const string COL_KEY_PRICE = 'price';
+ 
+-    public const COL_KEY_DELIVERY_DATE = 'delivery_date';
++    public const string COL_KEY_TOTAL = 'total';
+ 
+-    private const COL_TITLE_SKU = 'sales_merchant_portal_gui.order_item.sku';
++    public const string COL_KEY_DEPOSIT = 'deposit';
+ 
+-    private const COL_TITLE_IMAGE = 'sales_merchant_portal_gui.order_item.image';
++    public const string COL_KEY_DELIVERY_DATE = 'delivery_date';
+ 
+-    private const COL_TITLE_NAME = 'sales_merchant_portal_gui.order_item.name';
++    private const string COL_TITLE_SKU = 'sales_merchant_portal_gui.order_item.sku';
+ 
+-    private const COL_TITLE_PACKAGING_UNIT = 'sales_merchant_portal_gui.order_item.packaging_unit';
++    private const string COL_TITLE_IMAGE = 'sales_merchant_portal_gui.order_item.image';
+ 
+-    private const COL_TITLE_PRICE = 'sales_merchant_portal_gui.order_item.price';
++    private const string COL_TITLE_NAME = 'sales_merchant_portal_gui.order_item.name';
+ 
+-    private const COL_TITLE_QUANTITY = 'sales_merchant_portal_gui.order_item.quantity';
++    private const string COL_TITLE_PACKAGING_UNIT = 'sales_merchant_portal_gui.order_item.packaging_unit';
+ 
+-    private const COL_TITLE_TOTAL = 'sales_merchant_portal_gui.order_item.total';
++    private const string COL_TITLE_PRICE = 'sales_merchant_portal_gui.order_item.price';
+ 
+-    private const COL_TITLE_DELIVERY_DATE = 'sales_merchant_portal_gui.order_item.delivery_date';
++    private const string COL_TITLE_QUANTITY = 'sales_merchant_portal_gui.order_item.quantity';
+ 
+-    private const SEARCH_PLACEHOLDER = 'sales_merchant_portal_gui.order_items_search.placeholder';
++    private const string COL_TITLE_TOTAL = 'sales_merchant_portal_gui.order_item.total';
++
++    private const string COL_TITLE_DEPOSIT = 'sales_merchant_portal_gui.order_item.deposit';
++
++    private const string COL_TITLE_DELIVERY_DATE = 'sales_merchant_portal_gui.order_item.delivery_date';
++
++    private const string SEARCH_PLACEHOLDER = 'sales_merchant_portal_gui.order_items_search.placeholder';
+ 
+     /**
+      * @var \Pyz\Shared\GuiTable\GuiTableFactoryInterface
+@@ -89,8 +97,18 @@ class MerchantOrderItemGuiTableConfigurationProvider extends SprykerMerchantOrde
+             ->addColumnText(self::COL_KEY_PACKAGING_UNIT, self::COL_TITLE_PACKAGING_UNIT, false, true)
+             ->addColumnText(self::COL_KEY_PRICE, self::COL_TITLE_PRICE, true, true)
+             ->addColumnQuantity(static::COL_KEY_QUANTITY, self::COL_TITLE_QUANTITY, true, true)
+-            ->addColumnText(self::COL_KEY_TOTAL, self::COL_TITLE_TOTAL, true, true)
+-            ->addColumnDate(self::COL_KEY_DELIVERY_DATE, self::COL_TITLE_DELIVERY_DATE, true, true);
++            ->addColumnText(self::COL_KEY_TOTAL, self::COL_TITLE_TOTAL, true, true);
++
++        if ($this->isEnabled(FeatureFlags::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE)) {
++            $guiTableConfigurationBuilder->addColumnText(self::COL_KEY_DEPOSIT, self::COL_TITLE_DEPOSIT, false, true);
++        }
++
++        $guiTableConfigurationBuilder->addColumnDate(
++            self::COL_KEY_DELIVERY_DATE,
++            self::COL_TITLE_DELIVERY_DATE,
++            true,
++            true,
++        );
+ 
+         return $guiTableConfigurationBuilder;
+     }
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Communication/Controller/DetailController.php
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Communication/Controller/DetailController.php
+@@ -9,6 +9,8 @@ namespace Pyz\Zed\SalesMerchantPortalGui\Communication\Controller;
+ 
+ use Generated\Shared\Transfer\MerchantOrderCriteriaTransfer;
+ use Generated\Shared\Transfer\OrderItemFilterTransfer;
++use Pyz\Shared\FeatureFlag\FeatureFlags;
++use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Spryker\Zed\SalesMerchantPortalGui\Communication\Controller\DetailController as SprykerDetailController;
+ use Symfony\Component\HttpFoundation\JsonResponse;
+ use Symfony\Component\HttpFoundation\Request;
+@@ -21,6 +23,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+  */
+ class DetailController extends SprykerDetailController
+ {
++    use FeatureFlagAwareTrait;
++
+     /**
+      * @param \Symfony\Component\HttpFoundation\Request $request
+      *
+@@ -54,9 +58,19 @@ class DetailController extends SprykerDetailController
+             ->getProductMeasurementUnitFacade()
+             ->expandItemsWithSalesUnitTranslationKey($itemCollectionTransfer->getItems()->getArrayCopy());
+ 
++        $itemDepositTotals = [];
++        if ($this->isEnabled(FeatureFlags::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE)) {
++            $productDepositService = $this->getFactory()->getProductDepositService();
++            foreach ($expandedItems as $itemTransfer) {
++                $itemDepositTotals[$itemTransfer->getIdSalesOrderItem()]
++                    = $productDepositService->calculateItemDepositTotalFromMetadata($itemTransfer);
++            }
++        }
++
+         $responseData = [
+             'html' => $this->renderView('@SalesMerchantPortalGui/Partials/order_items_list.twig', [
+                 'orderItems' => $expandedItems,
++                'itemDepositTotals' => $itemDepositTotals,
+             ])->getContent(),
+         ];
+ 
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Communication/Controller/OrderDetailsController.php
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Communication/Controller/OrderDetailsController.php
+@@ -68,6 +68,7 @@ class OrderDetailsController extends AbstractSalesMerchantPortalGuiController
+             'shipment' => $merchantOrderTransfer->getMerchantOrderItems()[0]->getOrderItem()->getShipment(),
+             'backUrl' => self::URL_ORDER_LIST,
+             'tabNames' => $this->getFactory()->createOrderDetailsTabNamesProvider()->getTabNames(),
++            'shipmentExpenseType' => static::SHIPMENT_EXPENSE_TYPE,
+         ]);
+     }
+ 
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Communication/DataProvider/MerchantOrderItemGuiTableDataProvider.php
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Communication/DataProvider/MerchantOrderItemGuiTableDataProvider.php
+@@ -14,6 +14,9 @@ use Generated\Shared\Transfer\ItemTransfer;
+ use Generated\Shared\Transfer\MerchantOrderItemTransfer;
+ use Generated\Shared\Transfer\MoneyTransfer;
+ use Generated\Shared\Transfer\OrderTransfer;
++use Pyz\Service\ProductDeposit\ProductDepositServiceInterface;
++use Pyz\Shared\FeatureFlag\FeatureFlags;
++use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\ProductMeasurementUnit\Communication\Plugin\OrderItem\PackagingUnitLabelMerchantOrderItemTableExpanderPlugin;
+ use Pyz\Zed\ProductMeasurementUnit\Communication\Plugin\OrderItem\QuantityDataMerchantOrderItemTableExpanderPlugin;
+ use Pyz\Zed\SalesMerchantPortalGui\Communication\ConfigurationProvider\MerchantOrderItemGuiTableConfigurationProvider;
+@@ -28,6 +31,8 @@ use Spryker\Zed\SalesMerchantPortalGui\Persistence\SalesMerchantPortalGuiReposit
+ 
+ class MerchantOrderItemGuiTableDataProvider extends SprykerMerchantOrderItemGuiTableDataProvider
+ {
++    use FeatureFlagAwareTrait;
++
+     private array $currencyTransferCache = [];
+ 
+     /**
+@@ -47,6 +52,7 @@ class MerchantOrderItemGuiTableDataProvider extends SprykerMerchantOrderItemGuiT
+         SalesMerchantPortalGuiToSalesFacadeInterface $salesFacade,
+         private readonly CurrencyFacadeInterface $currencyFacade,
+         private readonly SalesMerchantPortalGuiToMoneyFacadeInterface $moneyFacade,
++        private readonly ProductDepositServiceInterface $productDepositService,
+         array $merchantOrderItemIds,
+         array $merchantOrderItemTableExpanderPlugins = []
+     ) {
+@@ -118,6 +124,11 @@ class MerchantOrderItemGuiTableDataProvider extends SprykerMerchantOrderItemGuiT
+             $responseData[MerchantOrderItemGuiTableConfigurationProvider::COL_KEY_PACKAGING_UNIT] = $payloadItem->getMetadata()?->getItemAttributes()[PackagingUnitLabelMerchantOrderItemTableExpanderPlugin::KEY_PACKING_UNIT_LABEL_FORMATTED] ?? $payloadItem->getPackagingUnitLabel();
+             $responseData[MerchantOrderItemGuiTableConfigurationProvider::COL_KEY_PRICE] = $this->getPriceData((string)$payloadItem->getUnitPrice(), $responseData[OrderTransfer::CURRENCY_ISO_CODE]);
+             $responseData[MerchantOrderItemGuiTableConfigurationProvider::COL_KEY_TOTAL] = $this->getPriceData((string)$payloadItem->getSumNetPrice(), $responseData[OrderTransfer::CURRENCY_ISO_CODE]);
++            if ($this->isEnabled(FeatureFlags::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE)) {
++                $depositTotal = $this->productDepositService->calculateItemDepositTotalFromMetadata($payloadItem);
++                $responseData[MerchantOrderItemGuiTableConfigurationProvider::COL_KEY_DEPOSIT]
++                    = $this->getPriceData((string)$depositTotal, $responseData[OrderTransfer::CURRENCY_ISO_CODE]);
++            }
+             $responseData[MerchantOrderItemGuiTableConfigurationProvider::COL_KEY_DELIVERY_DATE] = $payloadItem->getDeliveryDate();
+             $guiTableRowDataResponseTransfer->setResponseData($responseData);
+         }
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Communication/SalesMerchantPortalGuiCommunicationFactory.php
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Communication/SalesMerchantPortalGuiCommunicationFactory.php
+@@ -10,6 +10,7 @@ namespace Pyz\Zed\SalesMerchantPortalGui\Communication;
+ use Generated\Shared\Transfer\OrderRequestApproveRequestTransfer;
+ use Generated\Shared\Transfer\OrderRequestRejectRequestTransfer;
+ use Pyz\Client\Torsk\TorskClientInterface;
++use Pyz\Service\ProductDeposit\ProductDepositServiceInterface;
+ use Pyz\Shared\GuiTable\GuiTableFactoryInterface;
+ use Pyz\Zed\MerchantSalesOrder\Business\MerchantSalesOrderFacadeInterface;
+ use Pyz\Zed\OrderRequest\Business\OrderRequestFacadeInterface;
+@@ -97,11 +98,20 @@ class SalesMerchantPortalGuiCommunicationFactory extends SprykerSalesMerchantPor
+             $this->getSalesFacade(),
+             $this->getOriginalCurrencyFacade(),
+             $this->getMoneyFacade(),
++            $this->getProductDepositService(),
+             $merchantOrderItemIds,
+             $this->getMerchantOrderItemTableExpanderPlugins(),
+         );
+     }
+ 
++    /**
++     * @return \Pyz\Service\ProductDeposit\ProductDepositServiceInterface
++     */
++    public function getProductDepositService(): ProductDepositServiceInterface
++    {
++        return $this->getProvidedDependency(SalesMerchantPortalGuiDependencyProvider::SERVICE_PRODUCT_DEPOSIT);
++    }
++
+     /**
+      * @return \Pyz\Shared\GuiTable\GuiTableFactoryInterface
+      */
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Presentation/OrderDetails/index.twig
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Presentation/OrderDetails/index.twig
+@@ -179,8 +179,10 @@
+                                             },
+                                         ] %}
+                                         {% endif %}
+-                                        {% if merchantOrder.order.expenses is not empty %}
+-                                        {% set subtotalExpensesOrderTotals = merchantOrder.order.expenses | reduce((accumulator, expense) => (
++                                        {% set isDepositFeeEnabled = isFeatureFlagEnabled(constant('\\Pyz\\Shared\\FeatureFlag\\FeatureFlags::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE')) %}
++                                        {% set breakdownExpenses = isDepositFeeEnabled ? (merchantOrder.order.expenses | filter(expense => expense.type == shipmentExpenseType)) : merchantOrder.order.expenses %}
++                                        {% if breakdownExpenses is not empty %}
++                                        {% set subtotalExpensesOrderTotals = breakdownExpenses | reduce((accumulator, expense) => (
+                                             accumulator | merge([{
+                                             title: expense.shipment.method.carrierName ?? '' ~ ' ' ~ expense.name,
+                                             value: (expense.sumPrice | default(0)) | money(true, merchantData.currencyIsoCode),
+@@ -209,21 +211,35 @@
+                                     {% endblock %}
+ 
+                                     {% block totals %}
++                                        {% set isDepositFeeEnabled = isFeatureFlagEnabled(constant('\\Pyz\\Shared\\FeatureFlag\\FeatureFlags::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE')) %}
+                                         {% set grandTotalOrderTotals = [
+                                             {
+                                                 title: 'Grand Total' | trans,
+                                                 value: (merchantOrder.order.totals.grandTotal | default(0))| money(true, merchantData.currencyIsoCode),
+                                                 isTitle: true,
+                                             },
+-                                            {
++                                        ] %}
++                                        {% if isDepositFeeEnabled %}
++                                            {% set grandTotalOrderTotals = grandTotalOrderTotals | merge([{
++                                                title: 'sales_merchant_portal_gui.order_details.mercanto_fee' | trans,
++                                                value: (merchantOrder.order.totals.mercantoFeeTotal | default(0)) | money(true, merchantData.currencyIsoCode),
++                                            }]) %}
++                                        {% else %}
++                                            {% set grandTotalOrderTotals = grandTotalOrderTotals | merge([{
+                                                 title: 'sales_merchant_portal_gui.order_details.included_fees' | trans,
+                                                 value: (merchantOrder.order.totals.expenseTotal | default(0)) | money(true, merchantData.currencyIsoCode),
+-                                            },
+-                                            {
+-                                                title: 'sales_merchant_portal_gui.order_details.included_taxes' | trans,
+-                                                value: (merchantOrder.order.totals.taxTotal.amount | default(0)) | money(true, merchantData.currencyIsoCode),
+-                                            },
+-                                        ] %}
++                                            }]) %}
++                                        {% endif %}
++                                        {% set grandTotalOrderTotals = grandTotalOrderTotals | merge([{
++                                            title: 'sales_merchant_portal_gui.order_details.included_taxes' | trans,
++                                            value: (merchantOrder.order.totals.taxTotal.amount | default(0)) | money(true, merchantData.currencyIsoCode),
++                                        }]) %}
++                                        {% if isDepositFeeEnabled %}
++                                            {% set grandTotalOrderTotals = grandTotalOrderTotals | merge([{
++                                                title: 'sales_merchant_portal_gui.order_details.deposit' | trans,
++                                                value: (merchantOrder.order.totals.depositTotal | default(0)) | money(true, merchantData.currencyIsoCode),
++                                            }]) %}
++                                        {% endif %}
+ 
+                                         {% block totalsComponent %}
+                                             <web-mp-manage-order-totals
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Presentation/OrderRequestDetails/index.twig
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Presentation/OrderRequestDetails/index.twig
+@@ -220,6 +220,12 @@
+                         value: (quote.totals.taxTotal.amount ?? 0) | money(true, currencyCode),
+                     },
+                 ] %}
++                {% if isFeatureFlagEnabled(constant('\\Pyz\\Shared\\FeatureFlag\\FeatureFlags::FEATURE_MD_2505_DISPLAY_DEPOSIT_AND_MERCANTO_FEE')) %}
++                    {% set grandTotalOrderTotals = grandTotalOrderTotals | merge([{
++                        title: 'sales_merchant_portal_gui.order_details.deposit' | trans,
++                        value: (quote.totals.depositTotal | default(0)) | money(true, currencyCode),
++                    }]) %}
++                {% endif %}
+ 
+                 <web-spy-card spy-title="{{ 'Totals' | trans }}" class="{{ mainClass }}__card">
+                     <web-spy-collapsible
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/Presentation/Partials/order_items_list.twig
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/Presentation/Partials/order_items_list.twig
+@@ -21,6 +21,15 @@
+             <span class="mp-manage-order__totals-col">{{ (orderItem.sumPrice | default(0)) | money(true, orderItem.currencyIsoCode) }}</span>
+         </div>
+ 
++        {% set itemDepositTotal = (itemDepositTotals is defined ? itemDepositTotals[orderItem.idSalesOrderItem] : 0) | default(0) %}
++        {% if itemDepositTotal > 0 %}
++            <div class="mp-manage-order__totals-row mp-manage-order__totals-row--options">
++                <span class="mp-manage-order__totals-col">+ {{ 'sales_merchant_portal_gui.order_details.deposit_item_label' | trans }}</span>
++
++                <span class="mp-manage-order__totals-col">{{ itemDepositTotal | money(true, orderItem.currencyIsoCode) }}</span>
++            </div>
++        {% endif %}
++
+         {% for productOption in orderItem.productOptions %}
+             <div class="mp-manage-order__totals-row mp-manage-order__totals-row--options">
+                 <span class="mp-manage-order__totals-col">+ {{ productOption.value }}</span>
+
+--- a/src/Pyz/Zed/SalesMerchantPortalGui/SalesMerchantPortalGuiDependencyProvider.php
++++ b/src/Pyz/Zed/SalesMerchantPortalGui/SalesMerchantPortalGuiDependencyProvider.php
+@@ -10,6 +10,7 @@ namespace Pyz\Zed\SalesMerchantPortalGui;
+ use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
+ use Orm\Zed\OrderRequest\Persistence\PyzOrderRequestQuery;
+ use Pyz\Client\Torsk\TorskClientInterface;
++use Pyz\Service\ProductDeposit\ProductDepositServiceInterface;
+ use Pyz\Zed\MerchantSalesOrder\Business\MerchantSalesOrderFacadeInterface;
+ use Pyz\Zed\OrderRequest\Business\OrderRequestFacadeInterface;
+ use Pyz\Zed\ProductMeasurementUnit\Business\ProductMeasurementUnitFacadeInterface;
+@@ -30,6 +31,8 @@ class SalesMerchantPortalGuiDependencyProvider extends SprykerSalesMerchantPorta
+ 
+     public const string FACADE_PRODUCT_MEASUREMENT_UNIT = 'FACADE_PRODUCT_MEASUREMENT_UNIT';
+ 
++    public const string SERVICE_PRODUCT_DEPOSIT = 'SERVICE_PRODUCT_DEPOSIT';
++
+     public const string FACADE_ORDER_REQUEST = 'FACADE_ORDER_REQUEST';
+ 
+     public const string PROPEL_QUERY_MERCHANT = 'PROPEL_QUERY_MERCHANT';
+@@ -49,6 +52,7 @@ class SalesMerchantPortalGuiDependencyProvider extends SprykerSalesMerchantPorta
+         $container = $this->addTorskClient($container);
+         $container = $this->addProductMeasurementFacade($container);
+         $container = $this->addOrderRequestFacade($container);
++        $container = $this->addProductDepositService($container);
+ 
+         return $container;
+     }
+@@ -169,6 +173,21 @@ class SalesMerchantPortalGuiDependencyProvider extends SprykerSalesMerchantPorta
+         return $container;
+     }
+ 
++    /**
++     * @param \Spryker\Zed\Kernel\Container $container
++     *
++     * @return \Spryker\Zed\Kernel\Container
++     */
++    private function addProductDepositService(Container $container): Container
++    {
++        $container->set(
++            static::SERVICE_PRODUCT_DEPOSIT,
++            static fn (Container $container): ProductDepositServiceInterface => $container->getLocator()->productDeposit()->service(),
++        );
++
++        return $container;
++    }
++
+     /**
+      * @param \Spryker\Zed\Kernel\Container $container
+      *
+
+--- a/tests/PyzTest/Service/ProductDeposit/Service/ProductDepositServiceTest.php
++++ b/tests/PyzTest/Service/ProductDeposit/Service/ProductDepositServiceTest.php
+@@ -8,6 +8,7 @@
+ namespace PyzTest\Service\ProductDeposit\Service;
+ 
+ use Codeception\Test\Unit;
++use Generated\Shared\Transfer\ItemMetadataTransfer;
+ use Generated\Shared\Transfer\ItemTransfer;
+ use Generated\Shared\Transfer\ProductDepositLabelTransfer;
+ use PyzTest\Service\ProductDeposit\ProductDepositServiceTester;
+@@ -49,4 +50,68 @@ class ProductDepositServiceTest extends Unit
+         // (100 * 10 + (5 * 100) + 100) * 2 = 3200
+         self::assertSame(3200, $depositTotal);
+     }
++
++    /**
++     * @return void
++     */
++    public function testCalculateItemDepositTotalFromMetadataHydratesDepositsFromMetadata(): void
++    {
++        // Arrange
++        $itemTransfer = (new ItemTransfer())
++            ->setQuantity(2)
++            ->setMetadata((new ItemMetadataTransfer())->setItemAttributes([
++                ItemTransfer::DEPOSITS => [
++                    ['quantity' => 1, 'depositAmount' => 100],
++                    ['quantity' => 5, 'depositAmount' => 100],
++                ],
++            ]));
++
++        // Act
++        $depositTotal = $this->tester->getLocator()->productDeposit()->service()
++            ->calculateItemDepositTotalFromMetadata($itemTransfer);
++
++        // Assert
++        self::assertSame(1200, $depositTotal);
++    }
++
++    /**
++     * @return void
++     */
++    public function testCalculateItemDepositTotalFromMetadataUsesExistingCollectionWithoutRereadingMetadata(): void
++    {
++        // Arrange
++        $itemTransfer = (new ItemTransfer())
++            ->setQuantity(2)
++            ->addDeposit((new ProductDepositLabelTransfer())->setQuantity(1)->setDepositAmount(50))
++            ->setMetadata((new ItemMetadataTransfer())->setItemAttributes([
++                ItemTransfer::DEPOSITS => [
++                    ['quantity' => 100, 'depositAmount' => 999],
++                ],
++            ]));
++
++        // Act
++        $depositTotal = $this->tester->getLocator()->productDeposit()->service()
++            ->calculateItemDepositTotalFromMetadata($itemTransfer);
++
++        // Assert
++        self::assertSame(100, $depositTotal);
++    }
++
++    /**
++     * @return void
++     */
++    public function testCalculateItemDepositTotalFromMetadataReturnsZeroWhenNoDeposits(): void
++    {
++        // Arrange
++        $itemTransfer = (new ItemTransfer())
++            ->setQuantity(3)
++            ->setMetadata((new ItemMetadataTransfer())->setItemAttributes([]));
++
++        // Act
++        $depositTotal = $this->tester->getLocator()->productDeposit()->service()
++            ->calculateItemDepositTotalFromMetadata($itemTransfer);
++
++        // Assert
++        self::assertSame(0, $depositTotal);
++    }
+ }
+
+--- a/tests/PyzTest/Zed/MerchantSalesOrder/Business/MerchantSalesOrderFacadeTest.php
++++ b/tests/PyzTest/Zed/MerchantSalesOrder/Business/MerchantSalesOrderFacadeTest.php
+@@ -20,7 +20,9 @@ use Generated\Shared\Transfer\MerchantRelationshipTransfer;
+ use Generated\Shared\Transfer\QuoteTransfer;
+ use Generated\Shared\Transfer\SaveOrderTransfer;
+ use Generated\Shared\Transfer\StateMachineItemTransfer;
++use Generated\Shared\Transfer\TotalsTransfer;
+ use Iterator;
++use Orm\Zed\MerchantSalesOrder\Persistence\SpyMerchantSalesOrderTotalsQuery;
+ use Pyz\Zed\MerchantSalesOrder\Business\MerchantSalesOrderBusinessFactory;
+ use Pyz\Zed\MerchantSalesOrder\MerchantSalesOrderDependencyProvider;
+ use PyzTest\Zed\Merchant\Helper\MerchantOrderReferenceMerchantSalesOrderExpanderPluginStub;
+@@ -66,6 +68,36 @@ class MerchantSalesOrderFacadeTest extends Unit
+         self::assertNull($exportedMerchantSalesOrderTransfer->getExportedToJsonAt());
+     }
+ 
++    /**
++     * @return void
++     */
++    public function testMerchantOrderTotalsPersistDepositAndMercantoFeeTotals(): void
++    {
++        // Arrange
++        $saveOrderTransfer = $this->createSalesOrder();
++        $merchantSalesOrderTransfer = $this->tester->haveMerchantOrder([
++            MerchantOrderTransfer::ID_ORDER => $saveOrderTransfer->getIdSalesOrder(),
++        ]);
++
++        // Act
++        $this->tester->haveMerchantOrderTotals(
++            $merchantSalesOrderTransfer->getIdMerchantOrder(),
++            [
++                TotalsTransfer::DEPOSIT_TOTAL => 1330,
++                TotalsTransfer::MERCANTO_FEE_TOTAL => 990,
++            ],
++        );
++
++        // Assert
++        $merchantSalesOrderTotalsEntity = SpyMerchantSalesOrderTotalsQuery::create()
++            ->filterByFkMerchantSalesOrder($merchantSalesOrderTransfer->getIdMerchantOrder())
++            ->findOne();
++
++        self::assertNotNull($merchantSalesOrderTotalsEntity);
++        self::assertSame(1330, (int)$merchantSalesOrderTotalsEntity->getDepositTotal());
++        self::assertSame(990, (int)$merchantSalesOrderTotalsEntity->getMercantoFeeTotal());
++    }
++
+     /**
+      * @return void
+      */
+
+--- a/tests/PyzTest/Zed/SalesMerchantPortalGui/Communication/ConfigurationProvider/MerchantOrderItemGuiTableConfigurationProviderTest.php
++++ b/tests/PyzTest/Zed/SalesMerchantPortalGui/Communication/ConfigurationProvider/MerchantOrderItemGuiTableConfigurationProviderTest.php
+@@ -0,0 +1,90 @@
++<?php
++
++/**
++ * This file is part of the Pistor.ch mercanto project.
++ * For full license information, please view the LICENSE file that was distributed with this source code.
++ */
++
++declare(strict_types=1);
++
++namespace PyzTest\Zed\SalesMerchantPortalGui\Communication\ConfigurationProvider;
++
++use Codeception\Test\Unit;
++use Generated\Shared\Transfer\MerchantOrderTransfer;
++use Pyz\Shared\GuiTable\GuiTableFactory;
++use Pyz\Zed\SalesMerchantPortalGui\Communication\ConfigurationProvider\MerchantOrderItemGuiTableConfigurationProvider as ConfigProvider;
++use PyzTest\Zed\SalesMerchantPortalGui\SalesMerchantPortalGuiCommunicationTester;
++use Spryker\Zed\SalesMerchantPortalGui\Dependency\Facade\SalesMerchantPortalGuiToMerchantOmsFacadeInterface;
++use Spryker\Zed\SalesMerchantPortalGui\Dependency\Facade\SalesMerchantPortalGuiToMerchantUserFacadeInterface;
++use Spryker\Zed\SalesMerchantPortalGui\Dependency\Facade\SalesMerchantPortalGuiToTranslatorFacadeInterface;
++
++/**
++ * Auto-generated group annotations
++ *
++ * @group PyzTest
++ * @group Zed
++ * @group SalesMerchantPortalGui
++ * @group Communication
++ * @group ConfigurationProvider
++ * @group MerchantOrderItemGuiTableConfigurationProviderTest
++ * Add your own group annotations below this line
++ */
++class MerchantOrderItemGuiTableConfigurationProviderTest extends Unit
++{
++    protected SalesMerchantPortalGuiCommunicationTester $tester;
++
++    /**
++     * @return void
++     */
++    public function testDepositColumnIsAddedWhenFeatureFlagEnabled(): void
++    {
++        // Arrange
++        $this->tester->setFeatureFlagsEnabled();
++
++        // Act
++        $columnIds = $this->getConfiguredColumnIds();
++
++        // Assert
++        self::assertContains(ConfigProvider::COL_KEY_DEPOSIT, $columnIds);
++        self::assertContains(ConfigProvider::COL_KEY_TOTAL, $columnIds);
++    }
++
++    /**
++     * @return void
++     */
++    public function testDepositColumnIsNotAddedWhenFeatureFlagDisabled(): void
++    {
++        // Arrange
++        $this->tester->setFeatureFlagDisabled();
++
++        // Act
++        $columnIds = $this->getConfiguredColumnIds();
++
++        // Assert
++        self::assertNotContains(ConfigProvider::COL_KEY_DEPOSIT, $columnIds);
++        self::assertContains(ConfigProvider::COL_KEY_TOTAL, $columnIds);
++    }
++
++    /**
++     * @return array<int, string>
++     */
++    private function getConfiguredColumnIds(): array
++    {
++        $configurationProvider = new ConfigProvider(
++            $this->createMock(SalesMerchantPortalGuiToMerchantOmsFacadeInterface::class),
++            $this->createMock(SalesMerchantPortalGuiToMerchantUserFacadeInterface::class),
++            new GuiTableFactory(),
++            $this->createMock(SalesMerchantPortalGuiToTranslatorFacadeInterface::class),
++            [],
++        );
++
++        $guiTableConfigurationTransfer = $configurationProvider->getConfiguration(new MerchantOrderTransfer());
++
++        $columnIds = [];
++        foreach ($guiTableConfigurationTransfer->getColumns() as $columnTransfer) {
++            $columnIds[] = $columnTransfer->getId();
++        }
++
++        return $columnIds;
++    }
++}
+
+--- a/tests/PyzTest/Zed/SalesMerchantPortalGui/codeception.yml
++++ b/tests/PyzTest/Zed/SalesMerchantPortalGui/codeception.yml
+@@ -19,6 +19,8 @@ suites:
+         - Asserts
+         - \PyzTest\Shared\Testify\Helper\Environment
+         - \SprykerTest\Shared\Testify\Helper\DependencyHelper
++        - \SprykerTest\Client\Testify\Helper\ClientHelper
++        - \PyzTest\Shared\FeatureFlag\Helper\FeatureFlagHelper
+         - \SprykerTest\Shared\Testify\Helper\LocatorHelper:
+             projectNamespaces: ["Pyz"]
+   Persistence:
