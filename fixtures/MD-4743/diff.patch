@@ -1,0 +1,2054 @@
+--- a/src/Pyz/Shared/FeatureFlag/FeatureFlags.php
++++ b/src/Pyz/Shared/FeatureFlag/FeatureFlags.php
+@@ -37,22 +37,15 @@ interface FeatureFlags
+         self::FEATURE_MD_3526_MP_MEDIA_DELETE => false,
+         self::FEATURE_BRD_17167_PRODUCT_LIST_PAGE_INDEX_PUBLISH => false,
+         self::FEATURE_BRD_17167_PRODUCT_LIST_PAGE_INDEX_QUERY => false,
+-        self::FEATURE_MD_3715_SHOW_DELIVERY_PRODUCT_GROUP_MP => false,
+         self::FEATURE_BRD_17674_SHOW_NEW_SIZE_CATALOG_FILTERS => false,
+-        self::FEATURE_MD_3754_REORGANISED_PROFILE_NAV => false,
+-        self::FEATURE_MD_3438_MP_STICKY_FOOTER => false,
+-        self::FEATURE_MD_3440_MP_GLOBAL_LANGUAGE_SWITCH => false,
+         self::FEATURE_MD_4646_MP_GLOBAL_LANGUAGE_SWITCH_ALL_PAGES => false,
+-        self::FEATURE_MD_3951_RENAME_IMPORT_HISTORY_FILTERS => false,
+         self::FEATURE_BRD_17345_ENABLE_ORDERS_WITHOUT_MR => false,
+-        self::FEATURE_MD_4124_FIX_SHOPPING_LIST_LOCALE_JOIN => false,
+         self::FEATURE_BRD_8479_CART_STICKY_MERCHANT_HEADER => false,
+         self::FEATURE_BRD_18574_SHOW_BREADCRUMBS_ON_LARGE_VIEWPORT => false,
+         self::FEATURE_BRD_18502_PARALLEL_GLOBAL_CATEGORY => false,
+         self::FEATURE_MD_4450_MERCANTO_APP_PRODUCT_SYNC => false,
+         self::FEATURE_BRD_17681_IEFFECTS_USE_NEW_THRESHOLD_MESSAGES => false,
+         self::FEATURE_MD_4477_MAP_ERROR_SEVERITY => false,
+-        self::FEATURE_MD_3544_POST_URL_WITH_SLUG => false,
+         self::FEATURE_BRD_18475_SHOW_DELIVERY_TAB_MERCHANT_PROFILE => false,
+         self::FEATURE_MD_3706_CRASHED_JOBS_STATUS_FILTER => false,
+         self::FEATURE_MD_4180_ALLOW_JSON_IMPORTS => false,
+@@ -78,10 +71,6 @@ interface FeatureFlags
+     ];
+ 
+     public const array ZED_MENUS_BY_FEATURE_FLAG = [
+-        '/merchant-profile-merchant-portal-gui/delivery' => self::FEATURE_MD_3754_REORGANISED_PROFILE_NAV,
+-        '/merchant-profile-merchant-portal-gui/payment-methods' => self::FEATURE_MD_3754_REORGANISED_PROFILE_NAV,
+-        '/merchant-profile-merchant-portal-gui/downloads' => self::FEATURE_MD_3754_REORGANISED_PROFILE_NAV,
+-        '/merchant-profile-merchant-portal-gui/thresholds' => self::FEATURE_MD_3754_REORGANISED_PROFILE_NAV,
+         '/zip-code-gui/list-zip-code' => self::FEATURE_BRD_18690_SHOW_ZED_DELIVERY_AREAS_OVERVIEW,
+     ];
+ 
+@@ -123,24 +112,12 @@ interface FeatureFlags
+ 
+     public const string FEATURE_BRD_17167_PRODUCT_LIST_PAGE_INDEX_QUERY = 'brd_17167_product_list_page_index_query';
+ 
+-    public const string FEATURE_MD_3715_SHOW_DELIVERY_PRODUCT_GROUP_MP = 'md_3715_show_delivery_product_group_mp';
+-
+     public const string FEATURE_BRD_17674_SHOW_NEW_SIZE_CATALOG_FILTERS = 'brd_17674_show_new_size_catalog_filters';
+ 
+-    public const string FEATURE_MD_3754_REORGANISED_PROFILE_NAV = 'md_3754_reorganised_profile_nav';
+-
+-    public const string FEATURE_MD_3438_MP_STICKY_FOOTER = 'md_3438_mp_sticky_footer';
+-
+-    public const string FEATURE_MD_3440_MP_GLOBAL_LANGUAGE_SWITCH = 'md_3440_mp_global_language_switch';
+-
+     public const string FEATURE_MD_4646_MP_GLOBAL_LANGUAGE_SWITCH_ALL_PAGES = 'md_4646_mp_global_language_switch_all_pages';
+ 
+-    public const string FEATURE_MD_3951_RENAME_IMPORT_HISTORY_FILTERS = 'md_3951_rename_import_history_filters';
+-
+     public const string FEATURE_BRD_17345_ENABLE_ORDERS_WITHOUT_MR = 'brd_17345_enable_orders_without_mr';
+ 
+-    public const string FEATURE_MD_4124_FIX_SHOPPING_LIST_LOCALE_JOIN = 'md_4124_fix_shopping_list_locale_join';
+-
+     public const string FEATURE_BRD_15029_SHOW_ORDER_DATES_IN_AVAILABILITY_TOOLTIP = 'brd_15029_show_order_dates_in_availability_tooltip';
+ 
+     public const string FEATURE_BRD_8479_CART_STICKY_MERCHANT_HEADER = 'brd_8479_cart_sticky_merchant_header';
+@@ -155,8 +132,6 @@ interface FeatureFlags
+ 
+     public const string FEATURE_MD_4477_MAP_ERROR_SEVERITY = 'md_4477_map_error_severity';
+ 
+-    public const string FEATURE_MD_3544_POST_URL_WITH_SLUG = 'md_3544_post_url_with_slug';
+-
+     public const string FEATURE_BRD_18475_SHOW_DELIVERY_TAB_MERCHANT_PROFILE = 'brd_18475_show_delivery_tab_merchant_profile';
+ 
+     public const string FEATURE_MD_3706_CRASHED_JOBS_STATUS_FILTER = 'md_3706_crashed_jobs_status_filter';
+
+--- a/src/Pyz/Shared/MerchantPost/Slug/MerchantPostUrlSlugGenerator.php
++++ b/src/Pyz/Shared/MerchantPost/Slug/MerchantPostUrlSlugGenerator.php
+@@ -41,17 +41,6 @@ class MerchantPostUrlSlugGenerator
+         return $this->build(strtr($name, self::TRANSLITERATION_MAP), $uuid);
+     }
+ 
+-    /**
+-     * @param string $name
+-     * @param string $uuid
+-     *
+-     * @return string
+-     */
+-    public function generateWithoutTransliteration(string $name, string $uuid): string
+-    {
+-        return $this->build($name, $uuid);
+-    }
+-
+     /**
+      * @param string $name
+      * @param string $uuid
+
+--- a/src/Pyz/Yves/HomePage/Expander/MerchantPostDataExpander.php
++++ b/src/Pyz/Yves/HomePage/Expander/MerchantPostDataExpander.php
+@@ -11,17 +11,13 @@ namespace Pyz\Yves\HomePage\Expander;
+ 
+ use Generated\Shared\Transfer\MerchantStorageCriteriaTransfer;
+ use Pyz\Client\MerchantStorage\MerchantStorageClientInterface;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\MerchantPost\Slug\MerchantPostUrlSlugGenerator;
+-use Pyz\Yves\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Yves\MerchantPostPage\Plugin\Router\LocalizedMerchantPostRouteProviderPlugin;
+ use Spryker\Client\GlossaryStorage\GlossaryStorageClientInterface;
+ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+ 
+ class MerchantPostDataExpander
+ {
+-    use FeatureFlagAwareTrait;
+-
+     /**
+      * @param \Pyz\Client\MerchantStorage\MerchantStorageClientInterface $merchantStorageClient
+      * @param \Spryker\Client\GlossaryStorage\GlossaryStorageClientInterface $glossaryStorageClient
+@@ -51,7 +47,6 @@ class MerchantPostDataExpander
+ 
+         $merchantData = $this->getMerchantDataIndexedById($merchantIds, $localeName);
+         $translatedNames = $this->getBulkTranslatedNames($merchantPostDataArrays, $localeName);
+-        $isSlugUrlEnabled = $this->isFeatureEnabled(FeatureFlags::FEATURE_MD_3544_POST_URL_WITH_SLUG);
+ 
+         foreach ($merchantPostDataArrays as &$merchantPostDataArray) {
+             if (!isset($merchantData[$merchantPostDataArray['idMerchant']])) {
+@@ -63,9 +58,7 @@ class MerchantPostDataExpander
+             $nameGlossaryKey = $merchantPostDataArray['nameGlossaryKey'] ?? '';
+             $name = $translatedNames[$nameGlossaryKey] ?? '';
+             $uuid = (string)$merchantPostDataArray['uuid'];
+-            $slugAndUuid = $isSlugUrlEnabled
+-                ? $this->merchantPostUrlSlugGenerator->generate($name, $uuid)
+-                : $this->merchantPostUrlSlugGenerator->generateWithoutTransliteration($name, $uuid);
++            $slugAndUuid = $this->merchantPostUrlSlugGenerator->generate($name, $uuid);
+             $merchantPostDataArray['url'] = $this->getMerchantPostUrl(
+                 $merchantData[$merchantPostDataArray['idMerchant']]['urlSlug'],
+                 $slugAndUuid,
+
+--- a/src/Pyz/Yves/MerchantPage/Expander/MerchantViewDataExpander.php
++++ b/src/Pyz/Yves/MerchantPage/Expander/MerchantViewDataExpander.php
+@@ -14,13 +14,11 @@ use Pyz\Client\Locale\LocaleClientInterface;
+ use Pyz\Client\MerchantAnnouncementListStorage\MerchantAnnouncementListStorageClientInterface;
+ use Pyz\Client\MerchantCampaignStorage\MerchantCampaignStorageClientInterface;
+ use Pyz\Client\MerchantPostStorage\MerchantPostStorageClientInterface;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\Locale\LocaleConstants;
+ use Pyz\Shared\Merchant\MerchantConstants;
+ use Pyz\Shared\MerchantPost\Slug\MerchantPostUrlSlugGenerator;
+ use Pyz\Yves\CatalogPage\Plugin\Router\LocalizedCatalogPageRouteProviderPlugin;
+ use Pyz\Yves\CustomerPortal\Plugin\Router\CustomerPortalRouteProviderPlugin;
+-use Pyz\Yves\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Yves\MerchantPage\Plugin\Router\LocalizedMerchantPageRouteProviderPlugin;
+ use Pyz\Yves\MerchantPage\Reader\DeliveryOptionsReader;
+ use Pyz\Yves\MerchantPage\Reader\PaymentMethodsReader;
+@@ -31,8 +29,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+ 
+ class MerchantViewDataExpander
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const string MERCHANT_CAMPAIGN_URL_PATTERN = '%s?campaign[]=%s';
+ 
+     /**
+@@ -184,7 +180,6 @@ class MerchantViewDataExpander
+         $listItems = $merchantPostListTransfers[0]->getMerchantPostStorageListItems();
+ 
+         $translatedNames = $this->getBulkTranslatedNames($listItems->getArrayCopy(), $localeName);
+-        $isSlugUrlEnabled = $this->isFeatureEnabled(FeatureFlags::FEATURE_MD_3544_POST_URL_WITH_SLUG);
+ 
+         $merchantPosts = [];
+ 
+@@ -193,9 +188,7 @@ class MerchantViewDataExpander
+             $glossaryKey = $merchantPostListItemTransfer->getNameGlossaryKey() ?? '';
+             $name = $translatedNames[$glossaryKey] ?? '';
+             $uuid = (string)$merchantPostListItemTransfer->getUuid();
+-            $slugAndUuid = $isSlugUrlEnabled
+-                ? $this->merchantPostUrlSlugGenerator->generate($name, $uuid)
+-                : $this->merchantPostUrlSlugGenerator->generateWithoutTransliteration($name, $uuid);
++            $slugAndUuid = $this->merchantPostUrlSlugGenerator->generate($name, $uuid);
+             $merchantPost['url'] = $this->getMerchantPostUrl($merchantUrlSlug, $slugAndUuid);
+             $merchantPosts[] = $merchantPost;
+         }
+
+--- a/src/Pyz/Yves/MerchantPostPage/Controller/MerchantPostController.php
++++ b/src/Pyz/Yves/MerchantPostPage/Controller/MerchantPostController.php
+@@ -10,8 +10,6 @@ declare(strict_types=1);
+ namespace Pyz\Yves\MerchantPostPage\Controller;
+ 
+ use Generated\Shared\Transfer\MerchantPostStorageTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Yves\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Yves\MerchantPostPage\Plugin\Router\LocalizedMerchantPostRouteProviderPlugin;
+ use Spryker\Yves\Kernel\View\View;
+ use Symfony\Component\HttpFoundation\RedirectResponse;
+@@ -23,8 +21,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+  */
+ class MerchantPostController extends MerchantPostAbstractController
+ {
+-    use FeatureFlagAwareTrait;
+-
+     /**
+      * @param string $merchantUrlSlug
+      * @param string $merchantPostUuid
+@@ -42,14 +38,12 @@ class MerchantPostController extends MerchantPostAbstractController
+             throw new NotFoundHttpException();
+         }
+ 
+-        if ($this->isFeatureEnabled(FeatureFlags::FEATURE_MD_3544_POST_URL_WITH_SLUG)) {
+-            $canonicalSlugAndUuid = $this->resolveCanonicalSlugAndUuid($merchantPostStorageTransfer);
+-            if ($canonicalSlugAndUuid !== null && $merchantPostUuid !== $canonicalSlugAndUuid) {
+-                return $this->redirectResponseExternal(
+-                    $this->getCanonicalMerchantPostUrl($merchantUrlSlug, $canonicalSlugAndUuid),
+-                    Response::HTTP_MOVED_PERMANENTLY,
+-                );
+-            }
++        $canonicalSlugAndUuid = $this->resolveCanonicalSlugAndUuid($merchantPostStorageTransfer);
++        if ($canonicalSlugAndUuid !== null && $merchantPostUuid !== $canonicalSlugAndUuid) {
++            return $this->redirectResponseExternal(
++                $this->getCanonicalMerchantPostUrl($merchantUrlSlug, $canonicalSlugAndUuid),
++                Response::HTTP_MOVED_PERMANENTLY,
++            );
+         }
+ 
+         return $this->view(
+
+--- a/src/Pyz/Zed/DataImportMerchantPortalGui/Communication/GuiTable/ConfigurationProvider/DataImportMerchantPortalJobsGuiTableConfigurationProvider.php
++++ b/src/Pyz/Zed/DataImportMerchantPortalGui/Communication/GuiTable/ConfigurationProvider/DataImportMerchantPortalJobsGuiTableConfigurationProvider.php
+@@ -142,40 +142,22 @@ class DataImportMerchantPortalJobsGuiTableConfigurationProvider
+      */
+     private function addDateRangeFilters(GuiTableConfigurationBuilderInterface $guiTableConfigurationBuilder): void
+     {
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3951_RENAME_IMPORT_HISTORY_FILTERS)) {
+-            $guiTableConfigurationBuilder
+-                ->addFilterDateRange(
+-                    'importStart',
+-                    'data_import_merchant_portal_gui.import_start.label',
+-                    'data_import_merchant_portal_gui.import_start.from',
+-                    'data_import_merchant_portal_gui.import_start.to',
+-                    true,
+-                    self::DATE_TIME_FORMAT,
+-                )
+-                ->addFilterDateRange(
+-                    'importEnd',
+-                    'data_import_merchant_portal_gui.import_end.label',
+-                    'data_import_merchant_portal_gui.import_end.from',
+-                    'data_import_merchant_portal_gui.import_end.to',
+-                    true,
+-                    self::DATE_TIME_FORMAT,
+-                );
+-
+-            return;
+-        }
+-
+         $guiTableConfigurationBuilder
+             ->addFilterDateRange(
+-                'uploaded',
+-                'data_import_merchant_portal_gui.uploaded.label',
+-                'data_import_merchant_portal_gui.uploaded.from',
+-                'data_import_merchant_portal_gui.uploaded.to',
++                'importStart',
++                'data_import_merchant_portal_gui.import_start.label',
++                'data_import_merchant_portal_gui.import_start.from',
++                'data_import_merchant_portal_gui.import_start.to',
++                true,
++                self::DATE_TIME_FORMAT,
+             )
+             ->addFilterDateRange(
+-                'imported',
+-                'data_import_merchant_portal_gui.imported.label',
+-                'data_import_merchant_portal_gui.imported.from',
+-                'data_import_merchant_portal_gui.imported.to',
++                'importEnd',
++                'data_import_merchant_portal_gui.import_end.label',
++                'data_import_merchant_portal_gui.import_end.from',
++                'data_import_merchant_portal_gui.import_end.to',
++                true,
++                self::DATE_TIME_FORMAT,
+             );
+     }
+ }
+
+--- a/src/Pyz/Zed/DataImportMerchantPortalGui/Communication/GuiTable/DataProvider/DataImportMerchantPortalGuiTableDataProvider.php
++++ b/src/Pyz/Zed/DataImportMerchantPortalGui/Communication/GuiTable/DataProvider/DataImportMerchantPortalGuiTableDataProvider.php
+@@ -17,17 +17,13 @@ use Generated\Shared\Transfer\TorskJobChainsRequestTransfer;
+ use Generated\Shared\Transfer\TorskJobsEntryTransfer;
+ use Pyz\Client\Torsk\TorskClientInterface;
+ use Pyz\Service\UtilDateTime\UtilDateTimeServiceInterface;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Zed\DataImportMerchantPortalGui\Communication\Expander\TorskJobEntryExpander;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantUser\Business\MerchantUserFacadeInterface;
+ use Spryker\Shared\GuiTable\DataProvider\AbstractGuiTableDataProvider;
+ use Spryker\Shared\Kernel\Transfer\AbstractTransfer;
+ 
+ class DataImportMerchantPortalGuiTableDataProvider extends AbstractGuiTableDataProvider
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private MerchantUserTransfer $currentMerchantUser;
+ 
+     private const array DEFAULT_SOURCE_CHANNEL_FILTER = ['api', 'bucket'];
+@@ -38,8 +34,6 @@ class DataImportMerchantPortalGuiTableDataProvider extends AbstractGuiTableDataP
+ 
+     private const string FILE_TYPE_UNKNOWN = 'unknown';
+ 
+-    private const string RENAME_FILTERS_ENABLE_KEY = 'isRenameFiltersEnabled';
+-
+     /**
+      * @param \Pyz\Zed\MerchantUser\Business\MerchantUserFacadeInterface $merchantUserFacade
+      * @param \Pyz\Client\Torsk\TorskClientInterface $torskClient
+@@ -128,27 +122,15 @@ class DataImportMerchantPortalGuiTableDataProvider extends AbstractGuiTableDataP
+     ): TorskJobChainsRequestTransfer {
+         $isUnknownFileType = $criteriaTransfer->getFilterFileType() === self::FILE_TYPE_UNKNOWN;
+ 
+-        $isMD3951Enabled = $this->isEnabled(FeatureFlags::FEATURE_MD_3951_RENAME_IMPORT_HISTORY_FILTERS);
+-
+         $torskJobChainsRequestTransfer = (new TorskJobChainsRequestTransfer())
+             ->fromArray($criteriaTransfer->toArray(true, true), true)
+             ->setPageNumber($criteriaTransfer->getPage())
+             ->setDataType($isUnknownFileType ? null : $criteriaTransfer->getFilterFileType())
+-            ->setHasDataType($isUnknownFileType ? false : null);
+-
+-        if ($isMD3951Enabled) {
+-            $torskJobChainsRequestTransfer
+-                ->setStartedAtFrom($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportStart()?->getFrom()))
+-                ->setStartedAtTo($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportStart()?->getTo()))
+-                ->setEndDateFrom($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportEnd()?->getFrom()))
+-                ->setEndDateTo($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportEnd()?->getTo()));
+-        } else {
+-            $torskJobChainsRequestTransfer
+-                ->setFirstSeenAtFrom($this->formatDateTimeToIso8601($criteriaTransfer->getFilterUploaded()?->getFrom()))
+-                ->setFirstSeenAtTo($this->formatDateTimeToIso8601($criteriaTransfer->getFilterUploaded()?->getTo()))
+-                ->setProcessedAtFrom($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImported()?->getFrom()))
+-                ->setProcessedAtTo($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImported()?->getTo()));
+-        }
++            ->setHasDataType($isUnknownFileType ? false : null)
++            ->setStartedAtFrom($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportStart()?->getFrom()))
++            ->setStartedAtTo($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportStart()?->getTo()))
++            ->setEndDateFrom($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportEnd()?->getFrom()))
++            ->setEndDateTo($this->formatDateTimeToIso8601($criteriaTransfer->getFilterImportEnd()?->getTo()));
+ 
+         return $torskJobChainsRequestTransfer
+             ->setSourceChannel($this->resolveSourceChannelFilter($criteriaTransfer))
+@@ -175,9 +157,6 @@ class DataImportMerchantPortalGuiTableDataProvider extends AbstractGuiTableDataP
+         $jobItemViewData[TorskJobChainsEntryTransfer::CRASHED_AT] = $jobChainEntry->getCrashedAt();
+         $jobItemViewData[TorskJobChainsEntryTransfer::SOURCE_CHANNEL] = $jobChainEntry->getSourceChannel();
+         $jobItemViewData[TorskJobsEntryTransfer::UPLOAD_USER_REFERENCE] = $jobChainEntry->getPrimaryFilesUploadUserReference();
+-        $jobItemViewData[self::RENAME_FILTERS_ENABLE_KEY] = $this->isEnabled(
+-            FeatureFlags::FEATURE_MD_3951_RENAME_IMPORT_HISTORY_FILTERS,
+-        );
+ 
+         return $jobItemViewData;
+     }
+
+--- a/src/Pyz/Zed/DataImportMerchantPortalGui/Presentation/Components/app/pyz-data-import-table-column-collapsible/pyz-data-import-table-column-collapsible.component.html
++++ b/src/Pyz/Zed/DataImportMerchantPortalGui/Presentation/Components/app/pyz-data-import-table-column-collapsible/pyz-data-import-table-column-collapsible.component.html
+@@ -38,49 +38,32 @@
+     <div class="pyz-data-import-table-column-collapsible__header">
+         <div class="pyz-data-import-table-column-collapsible__header-left">
+             <div class="pyz-data-import-table-column-collapsible__header-dates">
+-                <ng-container *ngIf="data.isRenameFiltersEnabled; else startedAtPlain">
+-                    <spy-popover
+-                        [position]="popoverPosition"
+-                        [popoverTrigger]="popoverTrigger"
+-                    >
+-                        <span trigger>
+-                            <b>{{ data.startedAt | date: 'mediumDate'}}</b>, {{ data.startedAt | date: 'mediumTime' }}
+-                        </span>
+-                        <div class="pyz-data-import-table-column-collapsible__job-id-popover">
+-                            {{ 'data_import.import_table.import_start_timestamp' | spyI18n | async }}
+-                        </div>
+-                    </spy-popover>
+-                </ng-container>
+-                <ng-template #startedAtPlain>
+-                    <span>
++                <spy-popover
++                    [position]="popoverPosition"
++                    [popoverTrigger]="popoverTrigger"
++                >
++                    <span trigger>
+                         <b>{{ data.startedAt | date: 'mediumDate'}}</b>, {{ data.startedAt | date: 'mediumTime' }}
+                     </span>
+-                </ng-template>
+-                <ng-container *ngIf="data.isRenameFiltersEnabled; else endedAtPlain">
+-                    <spy-popover
+-                        *ngIf="data.endedAt"
+-                        [position]="popoverPosition"
+-                        [popoverTrigger]="popoverTrigger"
+-                    >
+-                        <span
+-                            trigger
+-                            class="pyz-data-import-table-column-collapsible__job-ended"
+-                        >
+-                            <b>{{ data.endedAt | date: 'mediumDate'}}</b>, {{ data.endedAt | date: 'mediumTime' }}
+-                        </span>
+-                        <div class="pyz-data-import-table-column-collapsible__job-id-popover">
+-                            {{ 'data_import.import_table.import_end_timestamp' | spyI18n | async }}
+-                        </div>
+-                    </spy-popover>
+-                </ng-container>
+-                <ng-template #endedAtPlain>
++                    <div class="pyz-data-import-table-column-collapsible__job-id-popover">
++                        {{ 'data_import.import_table.import_start_timestamp' | spyI18n | async }}
++                    </div>
++                </spy-popover>
++                <spy-popover
++                    *ngIf="data.endedAt"
++                    [position]="popoverPosition"
++                    [popoverTrigger]="popoverTrigger"
++                >
+                     <span
+-                        *ngIf="data.endedAt"
++                        trigger
+                         class="pyz-data-import-table-column-collapsible__job-ended"
+                     >
+                         <b>{{ data.endedAt | date: 'mediumDate'}}</b>, {{ data.endedAt | date: 'mediumTime' }}
+                     </span>
+-                </ng-template>
++                    <div class="pyz-data-import-table-column-collapsible__job-id-popover">
++                        {{ 'data_import.import_table.import_end_timestamp' | spyI18n | async }}
++                    </div>
++                </spy-popover>
+             </div>
+             <div class="pyz-data-import-table-column-collapsible__source_channel">
+                 <span *ngIf="data.sourceChannel">
+
+--- a/src/Pyz/Zed/DataImportMerchantPortalGui/Presentation/Components/app/pyz-data-import-table-column-collapsible/pyz-data-import-table-column-collapsible.interface.ts
++++ b/src/Pyz/Zed/DataImportMerchantPortalGui/Presentation/Components/app/pyz-data-import-table-column-collapsible/pyz-data-import-table-column-collapsible.interface.ts
+@@ -9,7 +9,6 @@ export interface DataImportJobInterface {
+   warningTotal: number;
+   errorTotal: number;
+   jobDetailUrl: string;
+-  isRenameFiltersEnabled: boolean;
+   jobSourceFiles: {
+     sourceFileName: string;
+     sourceFileSize: string;
+
+--- a/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/Controller/DetailsController.php
++++ b/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/Controller/DetailsController.php
+@@ -9,10 +9,7 @@ declare(strict_types=1);
+ 
+ namespace Pyz\Zed\DeliveryCalendarMerchantPortalGui\Communication\Controller;
+ 
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\DeliveryCalendarMerchantPortalGui\Communication\Form\DetailDeliveryCalendarForm;
+ use Pyz\Zed\DeliveryCalendarMerchantPortalGui\DeliveryCalendarMerchantPortalGuiConfig;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Spryker\Zed\Kernel\Communication\Controller\AbstractController;
+ use Symfony\Component\HttpFoundation\RedirectResponse;
+ use Symfony\Component\HttpFoundation\Request;
+@@ -24,8 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
+  */
+ class DetailsController extends AbstractController
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const PARAM_ID_DELIVERY_CALENDAR_WEEKDAYS = 'id-delivery-calendar-weekdays';
+ 
+     private const URL_DELIVERY_CALENDAR_LIST = '/delivery-calendar-merchant-portal-gui/list';
+@@ -54,14 +49,9 @@ class DetailsController extends AbstractController
+             return $this->redirectResponse(self::URL_DELIVERY_CALENDAR_LIST);
+         }
+ 
+-        $isDeliveryProductGroupEnabled = $this->isEnabled(FeatureFlags::FEATURE_MD_3715_SHOW_DELIVERY_PRODUCT_GROUP_MP);
+-
+-        $formOptions = $dataProvider->getOptions();
+-        $formOptions[DetailDeliveryCalendarForm::OPTION_IS_DELIVERY_PRODUCT_GROUP_ENABLED] = $isDeliveryProductGroupEnabled;
+-
+         $form = $this->getFactory()->createDetailDeliveryCalendarForm(
+             $deliveryCalendarTransfer,
+-            $formOptions,
++            $dataProvider->getOptions(),
+         );
+ 
+         $responseData = [
+@@ -69,15 +59,11 @@ class DetailsController extends AbstractController
+             'backUrl' => self::URL_DELIVERY_CALENDAR_LIST,
+             'weekdays' => DeliveryCalendarMerchantPortalGuiConfig::WEEKDAYS_NAMES_MAP,
+             'regularDeliveryWeekdays' => $deliveryCalendarTransfer->getWeekdays(),
+-            'isDeliveryProductGroupEnabled' => $isDeliveryProductGroupEnabled,
+-        ];
+-
+-        if ($isDeliveryProductGroupEnabled) {
+-            $responseData['assignedArticlesTableConfiguration'] = $this->getFactory()
++            'assignedArticlesTableConfiguration' => $this->getFactory()
+                 ->createDeliveryCalendarProductsGuiTableConfigurationProvider($idDeliveryCalendarWeekdays)
+-                ->getConfiguration();
+-            $responseData['idAssignedArticlesTable'] = 'delivery-calendar-assigned-products';
+-        }
++                ->getConfiguration(),
++            'idAssignedArticlesTable' => 'delivery-calendar-assigned-products',
++        ];
+ 
+         return $this->viewResponse($responseData);
+     }
+
+--- a/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/Form/DetailDeliveryCalendarForm.php
++++ b/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/Form/DetailDeliveryCalendarForm.php
+@@ -32,8 +32,6 @@ class DetailDeliveryCalendarForm extends AbstractType
+ 
+     public const OPTION_WEEKDAYS = 'option-weekdays';
+ 
+-    public const OPTION_IS_DELIVERY_PRODUCT_GROUP_ENABLED = 'option-is-delivery-product-group-enabled';
+-
+     /**
+      * @return string
+      */
+@@ -53,10 +51,6 @@ class DetailDeliveryCalendarForm extends AbstractType
+             self::OPTION_SHIPMENT_METHOD_ARRAY,
+             self::OPTION_WEEKDAYS,
+         ]);
+-
+-        $resolver->setDefaults([
+-            self::OPTION_IS_DELIVERY_PRODUCT_GROUP_ENABLED => false,
+-        ]);
+     }
+ 
+     /**
+@@ -69,13 +63,8 @@ class DetailDeliveryCalendarForm extends AbstractType
+     {
+         $this
+             ->addShipmentMethodField($builder, $options)
+-            ->addDeliveryGroupField($builder);
+-
+-        if ($options[self::OPTION_IS_DELIVERY_PRODUCT_GROUP_ENABLED]) {
+-            $this->addDeliveryProductGroupField($builder);
+-        }
+-
+-        $this
++            ->addDeliveryGroupField($builder)
++            ->addDeliveryProductGroupField($builder)
+             ->addActiveWeekdaysField($builder, $options[self::OPTION_WEEKDAYS])
+             ->addDatesField($builder);
+     }
+
+--- a/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/GuiTable/ConfigurationProvider/DeliveryCalendarGuiTableConfigurationProvider.php
++++ b/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/GuiTable/ConfigurationProvider/DeliveryCalendarGuiTableConfigurationProvider.php
+@@ -8,15 +8,11 @@
+ namespace Pyz\Zed\DeliveryCalendarMerchantPortalGui\Communication\GuiTable\ConfigurationProvider;
+ 
+ use Generated\Shared\Transfer\GuiTableConfigurationTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\GuiTable\Configuration\Builder\GuiTableConfigurationBuilderInterface;
+ use Pyz\Shared\GuiTable\GuiTableFactoryInterface;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ 
+ class DeliveryCalendarGuiTableConfigurationProvider
+ {
+-    use FeatureFlagAwareTrait;
+-
+     public const COL_ID_DELIVERY_CALENDAR_WEEKDAYS = 'idDeliveryCalendarWeekdays';
+ 
+     public const COL_KEY_SHIPMENT_METHOD_NAME = 'shipmentMethodName';
+@@ -79,11 +75,8 @@ class DeliveryCalendarGuiTableConfigurationProvider
+     {
+         $guiTableConfigurationBuilder
+             ->addColumnText(static::COL_KEY_SHIPMENT_METHOD_NAME, self::COL_TITLE_SHIPMENT_METHOD_NAME, false, false)
+-            ->addColumnText(static::COL_KEY_DELIVERY_GROUP, self::COL_TITLE_DELIVERY_GROUP, false, false);
+-
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3715_SHOW_DELIVERY_PRODUCT_GROUP_MP)) {
+-            $guiTableConfigurationBuilder->addColumnText(static::COL_KEY_DELIVERY_PRODUCT_GROUP, self::COL_TITLE_DELIVERY_PRODUCT_GROUP, false, false);
+-        }
++            ->addColumnText(static::COL_KEY_DELIVERY_GROUP, self::COL_TITLE_DELIVERY_GROUP, false, false)
++            ->addColumnText(static::COL_KEY_DELIVERY_PRODUCT_GROUP, self::COL_TITLE_DELIVERY_PRODUCT_GROUP, false, false);
+ 
+         return $guiTableConfigurationBuilder;
+     }
+
+--- a/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/GuiTable/DataProvider/DeliveryCalendarGuiTableDataProvider.php
++++ b/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Communication/GuiTable/DataProvider/DeliveryCalendarGuiTableDataProvider.php
+@@ -11,12 +11,10 @@ use Generated\Shared\Transfer\DeliveryCalendarTableCriteriaTransfer;
+ use Generated\Shared\Transfer\GuiTableDataRequestTransfer;
+ use Generated\Shared\Transfer\GuiTableDataResponseTransfer;
+ use Generated\Shared\Transfer\GuiTableRowDataResponseTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\MerchantPortalGui\MerchantPortalGuiConstants;
+ use Pyz\Shared\MerchantPortalGui\MerchantPortalGuiEmptyFieldsResolverTrait;
+ use Pyz\Zed\DeliveryCalendarMerchantPortalGui\Communication\GuiTable\ConfigurationProvider\DeliveryCalendarGuiTableConfigurationProvider;
+ use Pyz\Zed\DeliveryCalendarMerchantPortalGui\Persistence\DeliveryCalendarMerchantPortalGuiRepositoryInterface;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantUser\Business\MerchantUserFacadeInterface;
+ use Pyz\Zed\Translator\Business\TranslatorFacadeInterface;
+ use Spryker\Shared\GuiTable\DataProvider\AbstractGuiTableDataProvider;
+@@ -24,7 +22,6 @@ use Spryker\Shared\Kernel\Transfer\AbstractTransfer;
+ 
+ class DeliveryCalendarGuiTableDataProvider extends AbstractGuiTableDataProvider
+ {
+-    use FeatureFlagAwareTrait;
+     use MerchantPortalGuiEmptyFieldsResolverTrait;
+ 
+     /**
+@@ -66,12 +63,9 @@ class DeliveryCalendarGuiTableDataProvider extends AbstractGuiTableDataProvider
+                 DeliveryCalendarGuiTableConfigurationProvider::COL_ID_DELIVERY_CALENDAR_WEEKDAYS => $deliveryCalendarTableItemTransfer->getIdDeliveryCalendarWeekdays(),
+                 DeliveryCalendarGuiTableConfigurationProvider::COL_KEY_SHIPMENT_METHOD_NAME => $this->getShipmentMethodName($deliveryCalendarTableItemTransfer->getShipmentMethodName()),
+                 DeliveryCalendarGuiTableConfigurationProvider::COL_KEY_DELIVERY_GROUP => $this->resolveEmptyValue($deliveryCalendarTableItemTransfer->getDeliveryGroup()),
++                DeliveryCalendarGuiTableConfigurationProvider::COL_KEY_DELIVERY_PRODUCT_GROUP => $this->resolveEmptyValue($deliveryCalendarTableItemTransfer->getDeliveryProductGroup()),
+             ];
+ 
+-            if ($this->isEnabled(FeatureFlags::FEATURE_MD_3715_SHOW_DELIVERY_PRODUCT_GROUP_MP)) {
+-                $responseData[DeliveryCalendarGuiTableConfigurationProvider::COL_KEY_DELIVERY_PRODUCT_GROUP] = $this->resolveEmptyValue($deliveryCalendarTableItemTransfer->getDeliveryProductGroup());
+-            }
+-
+             $guiTableDataResponseTransfer->addRow((new GuiTableRowDataResponseTransfer())->setResponseData($responseData));
+         }
+ 
+
+--- a/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Presentation/Details/index.twig
++++ b/src/Pyz/Zed/DeliveryCalendarMerchantPortalGui/Presentation/Details/index.twig
+@@ -16,11 +16,9 @@
+     <web-mp-delivery-calendar-detail cloak
+         delivery-dates-tab-title="{{ 'delivery_calendar_merchant_portal_gui.details.delivery_dates.title' | trans }}"
+         assigned-articles-tab-title="{{ 'delivery_calendar_merchant_portal_gui.assigned_articles.title' | trans }}"
+-        show-assigned-articles-tab="{{ isDeliveryProductGroupEnabled ? 'true' : '' }}"
+-        {% if isDeliveryProductGroupEnabled %}
+-            assigned-articles-table-config='{{ guiTableConfiguration(assignedArticlesTableConfiguration) }}'
+-            assigned-articles-table-id="{{ idAssignedArticlesTable }}"
+-        {% endif %}
++        show-assigned-articles-tab="true"
++        assigned-articles-table-config='{{ guiTableConfiguration(assignedArticlesTableConfiguration) }}'
++        assigned-articles-table-id="{{ idAssignedArticlesTable }}"
+     >
+         <h1 title>{{ 'delivery_calendar_merchant_portal_gui.details.title' | trans }}</h1>
+         <div action>
+@@ -43,9 +41,7 @@
+                     <div class="spy-col spy-col-gutter-md spy-col-12">
+                         {{ form_row(deliveryCalendarForm.idShipmentMethod) }}
+                         {{ form_row(deliveryCalendarForm.deliveryGroup) }}
+-                        {% if isDeliveryProductGroupEnabled %}
+-                            {{ form_row(deliveryCalendarForm.deliveryProductGroup) }}
+-                        {% endif %}
++                        {{ form_row(deliveryCalendarForm.deliveryProductGroup) }}
+                     </div>
+                 </div>
+             </web-spy-card>
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Controller/AbstractMerchantPostController.php
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Controller/AbstractMerchantPostController.php
+@@ -9,7 +9,6 @@ namespace Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Controller;
+ 
+ use Generated\Shared\Transfer\MerchantPostTransfer;
+ use Generated\Shared\Transfer\MerchantTransfer;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantPortalGui\Communication\Controller\AbstractMerchantPortalController;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Processor\MerchantPostElementPreSaveProcessorInterface;
+ 
+@@ -18,8 +17,6 @@ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Processor\MerchantPostEl
+  */
+ abstract class AbstractMerchantPostController extends AbstractMerchantPortalController
+ {
+-    use FeatureFlagAwareTrait;
+-
+     protected const string URL_MERCHANT_POST_LIST = '/merchant-post-merchant-portal-gui/list';
+ 
+     protected const string MERCHANT_POST_SAVE_ERROR_MESSAGE = 'merchant_post_merchant_portal_gui.merchant_post_save.message.error';
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Controller/CreateMerchantPostController.php
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Controller/CreateMerchantPostController.php
+@@ -8,7 +8,6 @@
+ namespace Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Controller;
+ 
+ use Exception;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Exception\MerchantPostElementProcessException;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\TabNames\MerchantPostTabNamesProvider;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\MerchantPostMerchantPortalGuiConfig;
+@@ -62,8 +61,6 @@ class CreateMerchantPostController extends AbstractMerchantPostController
+             'merchantPostElementTypes' => $merchantPostElementTypes,
+             'nameTextMaxLength' => MerchantPostMerchantPortalGuiConfig::NAME_TEXT_MAXLENGTH,
+             'descriptionTextMaxLength' => MerchantPostMerchantPortalGuiConfig::DESCRIPTION_TEXT_MAXLENGTH,
+-            'isGlobalLanguageSwitchEnabled' => $this->isEnabled(FeatureFlags::FEATURE_MD_3440_MP_GLOBAL_LANGUAGE_SWITCH),
+-            'isStickyFooterEnabled' => $this->isEnabled(FeatureFlags::FEATURE_MD_3438_MP_STICKY_FOOTER),
+         ]);
+     }
+ 
+@@ -143,8 +140,6 @@ class CreateMerchantPostController extends AbstractMerchantPostController
+             'merchantPostElementTypes' => $merchantPostElementTypes,
+             'nameTextMaxLength' => MerchantPostMerchantPortalGuiConfig::NAME_TEXT_MAXLENGTH,
+             'descriptionTextMaxLength' => MerchantPostMerchantPortalGuiConfig::DESCRIPTION_TEXT_MAXLENGTH,
+-            'isGlobalLanguageSwitchEnabled' => $this->isEnabled(FeatureFlags::FEATURE_MD_3440_MP_GLOBAL_LANGUAGE_SWITCH),
+-            'isStickyFooterEnabled' => $this->isEnabled(FeatureFlags::FEATURE_MD_3438_MP_STICKY_FOOTER),
+         ]);
+     }
+ 
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Controller/EditMerchantPostController.php
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Controller/EditMerchantPostController.php
+@@ -8,7 +8,6 @@
+ namespace Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Controller;
+ 
+ use Exception;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\Locale\LocaleConstants;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Exception\MerchantPostElementProcessException;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Form\MerchantPostForm;
+@@ -207,9 +206,7 @@ class EditMerchantPostController extends AbstractMerchantPostController
+             'idMerchantPostUnassignedProductsTable' => MerchantPostMerchantPortalGuiConfig::PARAM_ID_MERCHANT_POST_UNASSIGNED_PRODUCTS,
+             'nameTextMaxLength' => MerchantPostMerchantPortalGuiConfig::NAME_TEXT_MAXLENGTH,
+             'descriptionTextMaxLength' => MerchantPostMerchantPortalGuiConfig::DESCRIPTION_TEXT_MAXLENGTH,
+-            'isGlobalLanguageSwitchEnabled' => $this->isEnabled(FeatureFlags::FEATURE_MD_3440_MP_GLOBAL_LANGUAGE_SWITCH),
+             'tabNames' => $tabNames,
+-            'isStickyFooterEnabled' => $this->isEnabled(FeatureFlags::FEATURE_MD_3438_MP_STICKY_FOOTER),
+         ];
+     }
+ 
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Generator/MerchantPostUrlGenerator.php
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Communication/Generator/MerchantPostUrlGenerator.php
+@@ -10,18 +10,14 @@ declare(strict_types=1);
+ namespace Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Generator;
+ 
+ use Generated\Shared\Transfer\MerchantPostTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\Locale\LocaleConstants;
+ use Pyz\Shared\MerchantPost\Slug\MerchantPostUrlSlugGenerator;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\Communication\Form\DataProvider\MerchantPostFormDataProvider;
+ use Pyz\Zed\MerchantPostMerchantPortalGui\MerchantPostMerchantPortalGuiConfig;
+ use Pyz\Zed\Translator\Business\TranslatorFacadeInterface;
+ 
+ class MerchantPostUrlGenerator
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const array URL_ROUTE_BY_LOCALE_MAP = [
+         LocaleConstants::LOCALE_DE_CH => '{yvesBaseUrl}/de/lieferant/{merchantUrlSlug}/profil/beitraege/{merchantPostUuid}',
+         LocaleConstants::LOCALE_FR_CH => '{yvesBaseUrl}/fr/fournisseur/{merchantUrlSlug}/profil/publications/{merchantPostUuid}',
+@@ -65,9 +61,7 @@ class MerchantPostUrlGenerator
+         $merchantUrlSlug = $this
+             ->translatorFacade
+             ->trans($merchantUserTransfer->getMerchant()?->getMerchantProfile()?->getUrlSlugGlossaryKey() ?? '', [], $localeName);
+-        $slugAndUuid = $this->isEnabled(FeatureFlags::FEATURE_MD_3544_POST_URL_WITH_SLUG)
+-            ? $this->generateSlugAndUuid($merchantPostTransfer, $localeName)
+-            : (string)$merchantPostTransfer->getUuid();
++        $slugAndUuid = $this->generateSlugAndUuid($merchantPostTransfer, $localeName);
+ 
+         return str_replace(
+             ['{yvesBaseUrl}', '{merchantUrlSlug}', '{merchantPostUuid}'],
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details/merchant-post-details.component.html
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details/merchant-post-details.component.html
+@@ -3,7 +3,7 @@
+         <ng-content select="[title]"></ng-content>
+         <ng-content actions select="[action]"></ng-content>
+     </spy-headline>
+-    <pyz-language-tab-switcher *ngIf="globalLanguageSwitchEnabled" [locales]="locales" [defaultLocale]="defaultLocale"></pyz-language-tab-switcher>
++    <pyz-language-tab-switcher [locales]="locales" [defaultLocale]="defaultLocale"></pyz-language-tab-switcher>
+ </div>
+ <div class="spy-row spy-row-gutter-md">
+     <div class="spy-col spy-col-gutter-md">
+@@ -14,7 +14,6 @@
+                 [locales]="locales"
+                 [addMerchantPostElementTitle]="addMerchantPostElementTitle"
+                 [merchantPostElementTypes]="merchantPostElementTypes"
+-                [stickyFooterEnabled]="stickyFooterEnabled"
+             ></mp-merchant-post-details-form>
+         </spy-card>
+ 
+@@ -31,8 +30,8 @@
+     </mp-merchant-post-element-types-modal>
+ </div>
+ 
+-<pyz-sticky-footer *ngIf="stickyFooterEnabled" [mpRevealWhenOutOfView]="actionBarSentinel">
+-    <pyz-language-tab-switcher *ngIf="globalLanguageSwitchEnabled" left [locales]="locales" [defaultLocale]="defaultLocale"></pyz-language-tab-switcher>
++<pyz-sticky-footer [mpRevealWhenOutOfView]="actionBarSentinel">
++    <pyz-language-tab-switcher left [locales]="locales" [defaultLocale]="defaultLocale"></pyz-language-tab-switcher>
+     <mp-merchant-post-element-types-modal
+         center
+         buttonSize="md"
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details/merchant-post-details.component.ts
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details/merchant-post-details.component.ts
+@@ -4,7 +4,6 @@ import {
+   Input,
+   ViewEncapsulation,
+   OnInit,
+-  booleanAttribute,
+ } from '@angular/core';
+ import {
+   LocaleInterface,
+@@ -29,7 +28,7 @@ import { MerchantPostAddFieldService } from './merchant-post-add-field.service';
+   changeDetection: ChangeDetectionStrategy.Default,
+   encapsulation: ViewEncapsulation.None,
+   host: {
+-    '[class.mp-merchant-post-details--with-sticky-footer]': 'stickyFooterEnabled',
++    class: 'mp-merchant-post-details--with-sticky-footer',
+   },
+ })
+ export class MerchantPostDetailsComponent implements OnInit {
+@@ -47,10 +46,6 @@ export class MerchantPostDetailsComponent implements OnInit {
+ 
+   @Input() defaultLocale = '';
+ 
+-  @Input({ transform: booleanAttribute }) globalLanguageSwitchEnabled = false;
+-
+-  @Input({ transform: booleanAttribute }) stickyFooterEnabled = false;
+-
+   @Input() backUrl = '';
+ 
+   @Input() backLabel = '';
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details/merchant-post-details.module.ts
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details/merchant-post-details.module.ts
+@@ -1,4 +1,4 @@
+-import { NgModule } from '@angular/core';
++import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ import { HeadlineModule } from '@spryker/headline';
+ import { MerchantPostDetailsComponent } from './merchant-post-details.component';
+@@ -23,5 +23,6 @@ import { IconModule } from '@spryker/icon';
+   declarations: [MerchantPostDetailsComponent],
+   exports: [MerchantPostDetailsComponent],
+   providers: [MerchantPostAddFieldService],
++  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+ })
+ export class MerchantPostDetailsModule {}
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details-form/merchant-post-details-form.component.ts
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Components/app/merchant-post-details-form/merchant-post-details-form.component.ts
+@@ -67,8 +67,6 @@ export class MerchantPostDetailsFormComponent implements OnInit, AfterViewInit {
+ 
+   @Input() locales: LocaleInterface[];
+ 
+-  @Input() stickyFooterEnabled = false;
+-
+   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
+ 
+   componentRefs = [];
+@@ -130,9 +128,7 @@ export class MerchantPostDetailsFormComponent implements OnInit, AfterViewInit {
+ 
+     triggerChangeEvent(this.elRef.nativeElement);
+ 
+-    if (this.stickyFooterEnabled) {
+-      this.scrollAndFocusNewElement(newRef);
+-    }
++    this.scrollAndFocusNewElement(newRef);
+   }
+ 
+   private scrollAndFocusNewElement(ref: ComponentRef<any>): void {
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/CreateMerchantPost/index.twig
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/CreateMerchantPost/index.twig
+@@ -16,7 +16,5 @@
+         defaultLocaleName: defaultLocaleName | default(''),
+         nameTextMaxLength: nameTextMaxLength,
+         descriptionTextMaxLength: descriptionTextMaxLength,
+-        isGlobalLanguageSwitchEnabled: isGlobalLanguageSwitchEnabled,
+-        isStickyFooterEnabled: isStickyFooterEnabled,
+     } only %}
+ {% endblock %}
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/EditMerchantPost/index.twig
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/EditMerchantPost/index.twig
+@@ -23,8 +23,6 @@
+     merchantPostPreviewUrl: merchantPostPreviewUrl | default,
+     nameTextMaxLength: nameTextMaxLength,
+     descriptionTextMaxLength: descriptionTextMaxLength,
+-    isGlobalLanguageSwitchEnabled: isGlobalLanguageSwitchEnabled,
+-    isStickyFooterEnabled: isStickyFooterEnabled,
+ } %}
+ 
+ {% set productsParams = {
+
+--- a/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Partials/merchant-post-details-form.twig
++++ b/src/Pyz/Zed/MerchantPostMerchantPortalGui/Presentation/Partials/merchant-post-details-form.twig
+@@ -102,8 +102,6 @@
+         form-elements="{{ formElements | json_encode() }}"
+         locales="{{ localesData | json_encode() }}"
+         default-locale="{{ defaultLocaleName }}"
+-        global-language-switch-enabled="{{ isGlobalLanguageSwitchEnabled ? 'true' : 'false' }}"
+-        sticky-footer-enabled="{{ isStickyFooterEnabled ? 'true' : 'false' }}"
+         back-url="{{ backUrl }}"
+         back-label="{{ 'merchant_portal.back_button.label' | trans }}"
+         save-label="{{ 'merchant_portal.save_button.label' | trans }}"
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/CreateDownloadController.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/CreateDownloadController.php
+@@ -9,10 +9,7 @@ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Controller;
+ 
+ use Exception;
+ use Generated\Shared\Transfer\MerchantDownloadTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantPortalGui\Communication\Controller\AbstractMerchantPortalController;
+-use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\TabNames\MerchantProfileTabNamesProvider;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig;
+ use Symfony\Component\Form\FormInterface;
+ use Symfony\Component\HttpFoundation\RedirectResponse;
+@@ -24,8 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
+  */
+ class CreateDownloadController extends AbstractMerchantPortalController
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const string MERCHANT_PROFILE_MERCHANT_PORTAL_GUI_DOWNLOAD_SAVE_MESSAGE_ERROR = 'merchant_profile_merchant_portal_gui.download.save.message.error';
+ 
+     private const string MERCHANT_PROFILE_MERCHANT_PORTAL_GUI_DOWNLOAD_SAVE_MESSAGE_SUCCESS = 'merchant_profile_merchant_portal_gui.download.save.message.success';
+@@ -109,11 +104,6 @@ class CreateDownloadController extends AbstractMerchantPortalController
+      */
+     private function getDownloadsUrl(): string
+     {
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DOWNLOADS;
+-        }
+-
+-        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PROFILE
+-            . '?tab=' . MerchantProfileTabNamesProvider::TAB_DOWNLOADS;
++        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DOWNLOADS;
+     }
+ }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/CreatePaymentMethodController.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/CreatePaymentMethodController.php
+@@ -9,10 +9,7 @@ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Controller;
+ 
+ use Exception;
+ use Generated\Shared\Transfer\MerchantPaymentMethodTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantPortalGui\Communication\Controller\AbstractMerchantPortalController;
+-use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\TabNames\MerchantProfileTabNamesProvider;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig;
+ use Spryker\Shared\Log\LoggerTrait;
+ use Symfony\Component\Form\FormInterface;
+@@ -26,7 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
+ class CreatePaymentMethodController extends AbstractMerchantPortalController
+ {
+     use LoggerTrait;
+-    use FeatureFlagAwareTrait;
+ 
+     private const string MERCHANT_PROFILE_MERCHANT_PORTAL_GUI_PAYMENT_METHOD_SAVE_MESSAGE_ERROR = 'merchant_profile_merchant_portal_gui.payment_method.save.message.error';
+ 
+@@ -113,11 +109,6 @@ class CreatePaymentMethodController extends AbstractMerchantPortalController
+      */
+     private function getPaymentMethodsUrl(): string
+     {
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PAYMENT_METHODS;
+-        }
+-
+-        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PROFILE
+-            . '?tab=' . MerchantProfileTabNamesProvider::TAB_PAYMENT_METHODS;
++        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PAYMENT_METHODS;
+     }
+ }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/EditDownloadController.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/EditDownloadController.php
+@@ -9,11 +9,8 @@ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Controller;
+ 
+ use Exception;
+ use Generated\Shared\Transfer\MerchantDownloadTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantPortalGui\Communication\Controller\AbstractMerchantPortalController;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\GuiTable\ConfigurationProvider\MerchantDownloadGuiTableConfigurationProvider;
+-use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\TabNames\MerchantProfileTabNamesProvider;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig;
+ use Symfony\Component\Form\FormInterface;
+ use Symfony\Component\HttpFoundation\JsonResponse;
+@@ -26,8 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
+  */
+ class EditDownloadController extends AbstractMerchantPortalController
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const string PARAM_ID_MERCHANT_DOWNLOAD = 'id-merchant-download';
+ 
+     private const string MERCHANT_POST_MERCHANT_PORTAL_GUI_MERCHANT_POST_SAVE_MESSAGE_ERROR = 'merchant_post_merchant_portal_gui.merchant_post_save.message.error';
+@@ -190,11 +185,6 @@ class EditDownloadController extends AbstractMerchantPortalController
+      */
+     private function getDownloadsUrl(): string
+     {
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DOWNLOADS;
+-        }
+-
+-        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PROFILE
+-            . '?tab=' . MerchantProfileTabNamesProvider::TAB_DOWNLOADS;
++        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DOWNLOADS;
+     }
+ }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/EditPaymentMethodController.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/EditPaymentMethodController.php
+@@ -9,10 +9,7 @@ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Controller;
+ 
+ use Exception;
+ use Generated\Shared\Transfer\MerchantPaymentMethodTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantPortalGui\Communication\Controller\AbstractMerchantPortalController;
+-use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\TabNames\MerchantProfileTabNamesProvider;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig;
+ use Spryker\Shared\Log\LoggerTrait;
+ use Symfony\Component\Form\FormInterface;
+@@ -26,7 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
+ class EditPaymentMethodController extends AbstractMerchantPortalController
+ {
+     use LoggerTrait;
+-    use FeatureFlagAwareTrait;
+ 
+     private const string PARAM_ID_MERCHANT_PAYMENT_METHOD = 'id-merchant-payment-method';
+ 
+@@ -142,11 +138,6 @@ class EditPaymentMethodController extends AbstractMerchantPortalController
+      */
+     private function getPaymentMethodsUrl(): string
+     {
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PAYMENT_METHODS;
+-        }
+-
+-        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PROFILE
+-            . '?tab=' . MerchantProfileTabNamesProvider::TAB_PAYMENT_METHODS;
++        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PAYMENT_METHODS;
+     }
+ }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/MerchantShipmentMethodDetailsController.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/MerchantShipmentMethodDetailsController.php
+@@ -8,9 +8,6 @@
+ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Controller;
+ 
+ use Generated\Shared\Transfer\MerchantToShipmentMethodTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+-use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\TabNames\MerchantProfileTabNamesProvider;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig;
+ use Spryker\Zed\Kernel\Communication\Controller\AbstractController;
+ use Symfony\Component\HttpFoundation\RedirectResponse;
+@@ -22,8 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
+  */
+ class MerchantShipmentMethodDetailsController extends AbstractController
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const PARAM_ID_MERCHANT_SHIPMENT_METHOD = 'merchant-shipment-method-id';
+ 
+     /**
+@@ -84,11 +79,6 @@ class MerchantShipmentMethodDetailsController extends AbstractController
+      */
+     private function getBackUrl(): string
+     {
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DELIVERY;
+-        }
+-
+-        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PROFILE
+-            . '?tab=' . MerchantProfileTabNamesProvider::TAB_SHIPMENTS;
++        return MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DELIVERY;
+     }
+ }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/ProfileController.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/ProfileController.php
+@@ -10,12 +10,10 @@ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Controller;
+ use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\MerchantRelationRequest\MerchantRelationRequestConstants;
+ use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+-use Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Form\DataProvider\DeliveryAreaFormDataProvider;
+ use Pyz\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig;
+ use Spryker\Zed\MerchantProfileMerchantPortalGui\Communication\Controller\ProfileController as SprykerProfileController;
+ use Symfony\Component\Form\FormInterface;
+ use Symfony\Component\HttpFoundation\Request;
+-use Symfony\Component\HttpFoundation\Response;
+ 
+ /**
+  * @method \Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\MerchantProfileMerchantPortalGuiCommunicationFactory getFactory()
+@@ -39,14 +37,9 @@ class ProfileController extends SprykerProfileController
+         $merchantProfileFormDataProvider = $this->getFactory()->createMerchantProfileFormDataProvider();
+         $merchantTransfer = $merchantProfileFormDataProvider->findMerchantById($idMerchant);
+ 
+-        $isNavReorganised = $this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV);
+-        $isDeliveryAreaEnabled = $this->isEnabled(FeatureFlags::FEATURE_BRD_18475_SHOW_DELIVERY_TAB_MERCHANT_PROFILE);
+-        $showDeliveryAreaTab = !$isNavReorganised && $isDeliveryAreaEnabled;
+-        $deliveryAreaFormDataProvider = $showDeliveryAreaTab ? $this->getFactory()->createDeliveryAreaFormDataProvider() : null;
+-
+         $merchantProfileForm = $this->getFactory()->createMerchantProfileForm(
+             $merchantTransfer,
+-            $this->getDeliveryAreaFormOptions($deliveryAreaFormDataProvider, $idMerchant),
++            [],
+         );
+         $merchantProfileForm->handleRequest($request);
+ 
+@@ -54,15 +47,11 @@ class ProfileController extends SprykerProfileController
+             $this->updateMerchant($merchantProfileForm);
+ 
+             if ($merchantProfileForm->isValid()) {
+-                if ($showDeliveryAreaTab) {
+-                    $this->saveDeliveryArea($merchantProfileForm);
+-                }
+-
+                 $merchantProfileFormDataProvider = $this->getFactory()->createMerchantProfileFormDataProvider();
+                 $merchantTransfer = $merchantProfileFormDataProvider->findMerchantById($idMerchant);
+                 $merchantProfileForm = $this->getFactory()->createMerchantProfileForm(
+                     $merchantTransfer,
+-                    $this->getDeliveryAreaFormOptions($deliveryAreaFormDataProvider, $idMerchant),
++                    [],
+                 );
+             }
+         }
+@@ -74,25 +63,12 @@ class ProfileController extends SprykerProfileController
+         $data['descriptionMaxLength'] = MerchantProfileMerchantPortalGuiConfig::DESCRIPTION_TEXTAREA_MAXLENGTH;
+         $data['informationMaxLength'] = MerchantProfileMerchantPortalGuiConfig::INFORMATION_TEXTAREA_MAXLENGTH;
+ 
+-        $data['isNavReorganised'] = $isNavReorganised;
+-        $data['isDeliveryAreaEnabled'] = $isDeliveryAreaEnabled;
+         $data['isNonMrOrdersEnabled'] = $this->isEnabled(FeatureFlags::FEATURE_BRD_17345_ENABLE_ORDERS_WITHOUT_MR);
+         $data['showMerchantRelationRequests'] = $this->getFactory()->getConfig()->isMerchantRelationRequestsVisible();
+ 
+         $tabNamesProvider = $this->getFactory()->createMerchantProfileTabNamesProvider();
+-        $data['tabNames'] = $tabNamesProvider->getTabNames($isNavReorganised, $isDeliveryAreaEnabled);
+-        $data['tabQaNames'] = $tabNamesProvider->getTabQaNames($isNavReorganised, $isDeliveryAreaEnabled);
+-
+-        if (!$isNavReorganised) {
+-            if ($showDeliveryAreaTab && $deliveryAreaFormDataProvider !== null) {
+-                $data['zipCodes'] = $deliveryAreaFormDataProvider->getActiveZipCodes();
+-            }
+-            $data['shipmentMethodsTableConfiguration'] = $this->getFactory()->createShipmentMethodGuiTableConfigurationProvider()->getConfiguration();
+-            $data['downloadTableConfiguration'] = $this->getFactory()->createMerchantDownloadGuiTableConfigurationProvider()->getConfiguration();
+-            $data['canCreateMerchantDownload'] = $this->canCreateMerchantDownload();
+-            $data['merchantDownloadLimit'] = $this->getFactory()->getConfig()->getMerchantDownloadLimit();
+-            $data['paymentMethodTableConfiguration'] = $this->getFactory()->createMerchantPaymentMethodGuiTableConfigurationProvider()->getConfiguration();
+-        }
++        $data['tabNames'] = $tabNamesProvider->getTabNames();
++        $data['tabQaNames'] = $tabNamesProvider->getTabQaNames();
+ 
+         $data['defaultLocaleName'] = $this->getSwitcherDefaultLocaleName();
+         $data['isGlobalLanguageSwitchEnabled'] = $this->isGlobalLanguageSwitchEnabled();
+@@ -100,93 +76,6 @@ class ProfileController extends SprykerProfileController
+         return $this->viewResponse($data);
+     }
+ 
+-    /**
+-     * @param \Symfony\Component\HttpFoundation\Request $request
+-     *
+-     * @return \Symfony\Component\HttpFoundation\Response
+-     */
+-    public function tableDataAction(Request $request): Response
+-    {
+-        return $this->getFactory()->getGuiTableHttpDataRequestExecutor()->execute(
+-            $request,
+-            $this->getFactory()->createShipmentMethodGuiTableDataProvider(),
+-            $this->getFactory()->createShipmentMethodGuiTableConfigurationProvider()->getConfiguration(),
+-        );
+-    }
+-
+-    /**
+-     * @param \Symfony\Component\HttpFoundation\Request $request
+-     *
+-     * @return \Symfony\Component\HttpFoundation\Response
+-     */
+-    public function downloadTableDataAction(Request $request): Response
+-    {
+-        return $this->getFactory()->getGuiTableHttpDataRequestExecutor()->execute(
+-            $request,
+-            $this->getFactory()->createMerchantDownloadGuiTableDataProvider(),
+-            $this->getFactory()->createMerchantDownloadGuiTableConfigurationProvider()->getConfiguration(),
+-        );
+-    }
+-
+-    /**
+-     * @param \Symfony\Component\HttpFoundation\Request $request
+-     *
+-     * @return \Symfony\Component\HttpFoundation\Response
+-     */
+-    public function paymentMethodTableDataAction(Request $request): Response
+-    {
+-        return $this->getFactory()->getGuiTableHttpDataRequestExecutor()->execute(
+-            $request,
+-            $this->getFactory()->createMerchantPaymentMethodGuiTableDataProvider(),
+-            $this->getFactory()->createMerchantPaymentMethodGuiTableConfigurationProvider()->getConfiguration(),
+-        );
+-    }
+-
+-    /**
+-     * @return bool
+-     */
+-    private function canCreateMerchantDownload(): bool
+-    {
+-        $idMerchant = $this->getFactory()->getMerchantUserFacade()->getCurrentMerchantUser()->getIdMerchant();
+-        $merchantDownloadCount = $this->getRepository()->getMerchantDownloadCount($idMerchant);
+-
+-        return $merchantDownloadCount < $this->getFactory()->getConfig()->getMerchantDownloadLimit();
+-    }
+-
+-    /**
+-     * @param \Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Form\DataProvider\DeliveryAreaFormDataProvider|null $deliveryAreaFormDataProvider
+-     * @param int $idMerchant
+-     *
+-     * @return array<string, mixed>
+-     */
+-    private function getDeliveryAreaFormOptions(
+-        ?DeliveryAreaFormDataProvider $deliveryAreaFormDataProvider,
+-        int $idMerchant
+-    ): array {
+-        if ($deliveryAreaFormDataProvider === null) {
+-            return [];
+-        }
+-
+-        return [
+-            'deliveryAreaCollection' => $deliveryAreaFormDataProvider->getMerchantShipmentMethodDeliveryAreaCollection($idMerchant),
+-        ];
+-    }
+-
+-    /**
+-     * @param \Symfony\Component\Form\FormInterface $merchantProfileForm
+-     *
+-     * @return void
+-     */
+-    private function saveDeliveryArea(FormInterface $merchantProfileForm): void
+-    {
+-        /** @var \Generated\Shared\Transfer\MerchantShipmentMethodDeliveryAreaCollectionTransfer $merchantShipmentMethodDeliveryAreaCollectionTransfer */
+-        $merchantShipmentMethodDeliveryAreaCollectionTransfer = $merchantProfileForm->get('deliveryAreaMerchantProfile')->getData();
+-
+-        $this->getFactory()
+-            ->getMerchantDeliveryAreaFacade()
+-            ->updateMerchantShipmentMethodDeliveryAreaCollection($merchantShipmentMethodDeliveryAreaCollectionTransfer);
+-    }
+-
+     /**
+      * @param \Symfony\Component\Form\FormInterface $merchantForm
+      *
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Form/DataProvider/MerchantProfileFormDataProvider.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Form/DataProvider/MerchantProfileFormDataProvider.php
+@@ -13,18 +13,9 @@ use Generated\Shared\Transfer\MerchantCollectionTransfer;
+ use Generated\Shared\Transfer\MerchantPortalSettingGlossaryAttributeValueTransfer;
+ use Generated\Shared\Transfer\MerchantPortalSettingLocalizedGlossaryAttributeTransfer;
+ use Generated\Shared\Transfer\MerchantProfileTransfer;
+-use Generated\Shared\Transfer\MerchantSalesOrderThresholdTransfer;
+ use Generated\Shared\Transfer\MerchantSupportedLocaleTransfer;
+ use Generated\Shared\Transfer\MerchantTransfer;
+-use Generated\Shared\Transfer\SalesOrderThresholdTypeTransfer;
+-use Generated\Shared\Transfer\SalesOrderThresholdValueTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Shared\SalesOrderThreshold\SalesOrderThresholdConfig;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\MerchantBusinessArea\Business\MerchantBusinessAreaFacadeInterface;
+-use Pyz\Zed\MerchantSalesOrderThreshold\Business\MerchantSalesOrderThresholdFacadeInterface;
+-use Pyz\Zed\Store\Business\StoreFacadeInterface;
+-use Spryker\Zed\Currency\Business\CurrencyFacadeInterface;
+ use Spryker\Zed\MerchantProfileMerchantPortalGui\Communication\Form\DataProvider\MerchantProfileFormDataProvider as SprykerMerchantProfileFormDataProvider;
+ use Spryker\Zed\MerchantProfileMerchantPortalGui\Dependency\Facade\MerchantProfileMerchantPortalGuiToGlossaryFacadeInterface;
+ use Spryker\Zed\MerchantProfileMerchantPortalGui\Dependency\Facade\MerchantProfileMerchantPortalGuiToLocaleFacadeInterface;
+@@ -33,21 +24,11 @@ use Spryker\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGu
+ 
+ class MerchantProfileFormDataProvider extends SprykerMerchantProfileFormDataProvider
+ {
+-    use FeatureFlagAwareTrait;
+-
+-    /**
+-     * @var int
+-     */
+-    private const int DEFAULT_THRESHOLD = 0;
+-
+     /**
+      * @param \Spryker\Zed\MerchantProfileMerchantPortalGui\MerchantProfileMerchantPortalGuiConfig $merchantProfileMerchantPortalGuiConfig
+      * @param \Spryker\Zed\MerchantProfileMerchantPortalGui\Dependency\Facade\MerchantProfileMerchantPortalGuiToMerchantFacadeInterface $merchantFacade
+      * @param \Spryker\Zed\MerchantProfileMerchantPortalGui\Dependency\Facade\MerchantProfileMerchantPortalGuiToGlossaryFacadeInterface $glossaryFacade
+      * @param \Spryker\Zed\MerchantProfileMerchantPortalGui\Dependency\Facade\MerchantProfileMerchantPortalGuiToLocaleFacadeInterface $localeFacade
+-     * @param \Pyz\Zed\MerchantSalesOrderThreshold\Business\MerchantSalesOrderThresholdFacadeInterface $merchantSalesOrderThresholdFacade
+-     * @param \Pyz\Zed\Store\Business\StoreFacadeInterface $storeFacade
+-     * @param \Spryker\Zed\Currency\Business\CurrencyFacadeInterface $currencyFacade
+      * @param \Pyz\Zed\MerchantBusinessArea\Business\MerchantBusinessAreaFacadeInterface $merchantBusinessAreaFacade
+      */
+     public function __construct(
+@@ -55,9 +36,6 @@ class MerchantProfileFormDataProvider extends SprykerMerchantProfileFormDataProv
+         MerchantProfileMerchantPortalGuiToMerchantFacadeInterface $merchantFacade,
+         MerchantProfileMerchantPortalGuiToGlossaryFacadeInterface $glossaryFacade,
+         MerchantProfileMerchantPortalGuiToLocaleFacadeInterface $localeFacade,
+-        private readonly MerchantSalesOrderThresholdFacadeInterface $merchantSalesOrderThresholdFacade,
+-        private readonly StoreFacadeInterface $storeFacade,
+-        private readonly CurrencyFacadeInterface $currencyFacade,
+         private readonly MerchantBusinessAreaFacadeInterface $merchantBusinessAreaFacade,
+     ) {
+         parent::__construct(
+@@ -81,10 +59,6 @@ class MerchantProfileFormDataProvider extends SprykerMerchantProfileFormDataProv
+             return null;
+         }
+ 
+-        if (!$this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            $merchantTransfer = $this->addMerchantSalesOrderThresholds($merchantTransfer);
+-        }
+-
+         $this->expandMerchantWithBusinessAreaIds($merchantTransfer);
+         $this->removeNotSupportedLocalizedAttributes($merchantTransfer);
+ 
+@@ -109,54 +83,6 @@ class MerchantProfileFormDataProvider extends SprykerMerchantProfileFormDataProv
+         $merchantTransfer->setBusinessAreaCodes($expandedMerchant->getBusinessAreaCodes());
+     }
+ 
+-    /**
+-     * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+-     *
+-     * @return \Generated\Shared\Transfer\MerchantTransfer
+-     */
+-    private function addMerchantSalesOrderThresholds(MerchantTransfer $merchantTransfer): MerchantTransfer
+-    {
+-        $merchantSalesOrderThresholds = $this->merchantSalesOrderThresholdFacade->findMerchantThresholds($merchantTransfer->getIdMerchant());
+-        $merchantSalesOrderThresholdsByType = $this->mapThresholdsByType($merchantSalesOrderThresholds);
+-
+-        $storeTransfer = $this->storeFacade->getCurrentStore();
+-        $currencyTransfer = $this->currencyFacade->getDefaultCurrencyForCurrentStore();
+-
+-        foreach (SalesOrderThresholdConfig::SALES_ORDER_THRESHOLD_TYPES as $salesOrderThresholdType) {
+-            if (!isset($merchantSalesOrderThresholdsByType[$salesOrderThresholdType])) {
+-                $merchantSalesOrderThresholds[] = (new MerchantSalesOrderThresholdTransfer())
+-                    ->setMerchant($merchantTransfer)
+-                    ->setSalesOrderThresholdValue(
+-                        (new SalesOrderThresholdValueTransfer())
+-                            ->setSalesOrderThresholdType((new SalesOrderThresholdTypeTransfer())->setKey($salesOrderThresholdType))
+-                            ->setThreshold(self::DEFAULT_THRESHOLD),
+-                    )
+-                    ->setStore($storeTransfer)
+-                    ->setCurrency($currencyTransfer);
+-            }
+-        }
+-
+-        $merchantTransfer->setMerchantSalesOrderThresholds(new ArrayObject($merchantSalesOrderThresholds));
+-
+-        return $merchantTransfer;
+-    }
+-
+-    /**
+-     * @param array<\Generated\Shared\Transfer\MerchantSalesOrderThresholdTransfer> $merchantSalesOrderThresholds
+-     *
+-     * @return array<\Generated\Shared\Transfer\MerchantSalesOrderThresholdTransfer>
+-     */
+-    private function mapThresholdsByType(array $merchantSalesOrderThresholds): array
+-    {
+-        $merchantSalesOrderThresholdsByType = [];
+-
+-        foreach ($merchantSalesOrderThresholds as $merchantSalesOrderThresholdTransfer) {
+-            $merchantSalesOrderThresholdsByType[$merchantSalesOrderThresholdTransfer->getSalesOrderThresholdValue()->getSalesOrderThresholdType()->getKey()] = $merchantSalesOrderThresholdTransfer;
+-        }
+-
+-        return $merchantSalesOrderThresholdsByType;
+-    }
+-
+     /**
+      * @param \Generated\Shared\Transfer\MerchantTransfer $merchantTransfer
+      *
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Form/MerchantProfileForm.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/Form/MerchantProfileForm.php
+@@ -8,11 +8,8 @@
+ namespace Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\Form;
+ 
+ use Generated\Shared\Transfer\MerchantTransfer;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Spryker\Zed\MerchantProfileMerchantPortalGui\Communication\Form\MerchantProfileForm as SprykerMerchantProfileForm;
+ use Symfony\Component\Form\FormBuilderInterface;
+-use Symfony\Component\OptionsResolver\OptionsResolver;
+ 
+ /**
+  * @method \Pyz\Zed\MerchantProfileMerchantPortalGui\Communication\MerchantProfileMerchantPortalGuiCommunicationFactory getFactory()
+@@ -21,28 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
+  */
+ class MerchantProfileForm extends SprykerMerchantProfileForm
+ {
+-    use FeatureFlagAwareTrait;
+-
+     private const string FIELD_SETTINGS_MERCHANT_PROFILE = 'settingsMerchantProfile';
+ 
+-    private const string FIELD_NOTIFICATIONS_MERCHANT_PROFILE = 'notificationsMerchantProfile';
+-
+-    private const string FIELD_DELIVERY_AREA_MERCHANT_PROFILE = 'deliveryAreaMerchantProfile';
+-
+-    private const string OPTION_DELIVERY_AREA_COLLECTION = 'deliveryAreaCollection';
+-
+-    /**
+-     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
+-     *
+-     * @return void
+-     */
+-    public function configureOptions(OptionsResolver $resolver): void
+-    {
+-        parent::configureOptions($resolver);
+-
+-        $resolver->setDefault(self::OPTION_DELIVERY_AREA_COLLECTION, null);
+-    }
+-
+     /**
+      * @param \Symfony\Component\Form\FormBuilderInterface<mixed> $builder
+      * @param array<string, mixed> $options
+@@ -53,35 +30,6 @@ class MerchantProfileForm extends SprykerMerchantProfileForm
+     {
+         parent::buildForm($builder, $options);
+         $this->addSettingsMerchantProfileSubform($builder);
+-
+-        if (!$this->isEnabled(FeatureFlags::FEATURE_MD_3754_REORGANISED_PROFILE_NAV)) {
+-            if ($this->isEnabled(FeatureFlags::FEATURE_BRD_18475_SHOW_DELIVERY_TAB_MERCHANT_PROFILE)) {
+-                $this->addDeliveryAreaMerchantProfileSubform($builder, $options);
+-            }
+-
+-            $this->addNotificationsMerchantProfileSubform($builder);
+-        }
+-    }
+-
+-    /**
+-     * @param \Symfony\Component\Form\FormBuilderInterface $builder
+-     * @param array<string, mixed> $options
+-     *
+-     * @return $this
+-     */
+-    private function addDeliveryAreaMerchantProfileSubform(FormBuilderInterface $builder, array $options)
+-    {
+-        $builder->add(
+-            self::FIELD_DELIVERY_AREA_MERCHANT_PROFILE,
+-            DeliveryAreaMerchantProfileForm::class,
+-            [
+-                'label' => false,
+-                'mapped' => false,
+-                'data' => $options[self::OPTION_DELIVERY_AREA_COLLECTION],
+-            ],
+-        );
+-
+-        return $this;
+     }
+ 
+     /**
+@@ -124,26 +72,6 @@ class MerchantProfileForm extends SprykerMerchantProfileForm
+         return $this;
+     }
+ 
+-    /**
+-     * @param \Symfony\Component\Form\FormBuilderInterface $builder
+-     *
+-     * @return $this
+-     */
+-    private function addNotificationsMerchantProfileSubform(FormBuilderInterface $builder)
+-    {
+-        $builder->add(
+-            self::FIELD_NOTIFICATIONS_MERCHANT_PROFILE,
+-            NotificationsMerchantProfileForm::class,
+-            [
+-                'label' => false,
+-                'data' => $builder->getForm()->getData(),
+-                'data_class' => MerchantTransfer::class,
+-            ],
+-        );
+-
+-        return $this;
+-    }
+-
+     /**
+      * @param \Symfony\Component\Form\FormBuilderInterface $builder
+      *
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/TabNames/MerchantProfileTabNamesProvider.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/TabNames/MerchantProfileTabNamesProvider.php
+@@ -19,61 +19,30 @@ class MerchantProfileTabNamesProvider
+ 
+     public const string TAB_SHIPMENTS = 'shipments';
+ 
+-    public const string TAB_PAYMENT_METHODS = 'payment-methods';
+-
+-    public const string TAB_DOWNLOADS = 'downloads';
+-
+     public const string TAB_SETTINGS = 'settings';
+ 
+-    public const string TAB_NOTIFICATIONS = 'notifications';
+-
+     private const string QA_PREFIX = 'qa-tab-';
+ 
+     /**
+-     * @param bool $isNavReorganised
+-     * @param bool $isDeliveryAreaEnabled
+-     *
+      * @return list<string>
+      */
+-    public function getTabNames(bool $isNavReorganised, bool $isDeliveryAreaEnabled): array
++    public function getTabNames(): array
+     {
+-        if ($isNavReorganised) {
+-            return [
+-                self::TAB_BUSINESS_INFO,
+-                self::TAB_ONLINE_PROFILE,
+-                self::TAB_SETTINGS,
+-            ];
+-        }
+-
+-        $tabNames = [
++        return [
+             self::TAB_BUSINESS_INFO,
+             self::TAB_ONLINE_PROFILE,
+-        ];
+-
+-        if ($isDeliveryAreaEnabled) {
+-            $tabNames[] = self::TAB_DELIVERY_AREA;
+-        }
+-
+-        return array_merge($tabNames, [
+-            self::TAB_SHIPMENTS,
+-            self::TAB_PAYMENT_METHODS,
+-            self::TAB_DOWNLOADS,
+             self::TAB_SETTINGS,
+-            self::TAB_NOTIFICATIONS,
+-        ]);
++        ];
+     }
+ 
+     /**
+-     * @param bool $isNavReorganised
+-     * @param bool $isDeliveryAreaEnabled
+-     *
+      * @return list<string>
+      */
+-    public function getTabQaNames(bool $isNavReorganised, bool $isDeliveryAreaEnabled): array
++    public function getTabQaNames(): array
+     {
+         return array_map(
+             static fn (string $tabName): string => self::QA_PREFIX . $tabName,
+-            $this->getTabNames($isNavReorganised, $isDeliveryAreaEnabled),
++            $this->getTabNames(),
+         );
+     }
+ 
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/MerchantProfileMerchantPortalGuiCommunicationFactory.php
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Communication/MerchantProfileMerchantPortalGuiCommunicationFactory.php
+@@ -170,9 +170,6 @@ class MerchantProfileMerchantPortalGuiCommunicationFactory extends SprykerMercha
+             $this->getMerchantFacade(),
+             $this->getGlossaryFacade(),
+             $this->getLocaleFacade(),
+-            $this->getMerchantSalesOrderThresholdFacade(),
+-            $this->getStoreFacade(),
+-            $this->getCurrencyFacade(),
+             $this->getMerchantBusinessAreaFacade(),
+         );
+     }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Presentation/Components/app/merchant-profile-tabs/merchant-profile-tabs.component.html
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Presentation/Components/app/merchant-profile-tabs/merchant-profile-tabs.component.html
+@@ -12,28 +12,8 @@
+         <ng-content select="[onlineProfile]"></ng-content>
+         <ng-content actions select="[action]"></ng-content>
+     </spy-tab>
+-    <spy-tab *ngIf="!isNavReorganised && isDeliveryAreaEnabled" [spyTitle]="deliveryAreaTabTitle">
+-        <ng-content select="[deliveryArea]"></ng-content>
+-        <ng-content actions select="[action]"></ng-content>
+-    </spy-tab>
+-    <spy-tab *ngIf="!isNavReorganised" [spyTitle]="shipmentsTabTitle">
+-        <ng-content select="[shipments]"></ng-content>
+-        <ng-content actions select="[action]"></ng-content>
+-    </spy-tab>
+-    <spy-tab *ngIf="!isNavReorganised" [spyTitle]="paymentMethodsTabTitle">
+-        <ng-content select="[paymentMethods]"></ng-content>
+-        <ng-content actions select="[action]"></ng-content>
+-    </spy-tab>
+-    <spy-tab *ngIf="!isNavReorganised" [spyTitle]="downloadsTabTitle">
+-        <ng-content select="[downloads]"></ng-content>
+-        <ng-content actions select="[action]"></ng-content>
+-    </spy-tab>
+     <spy-tab [spyTitle]="settingsTabTitle" [hasWarning]="settingsTabHasWarning">
+         <ng-content select="[settings]"></ng-content>
+         <ng-content actions select="[action]"></ng-content>
+     </spy-tab>
+-    <spy-tab *ngIf="!isNavReorganised" [spyTitle]="notificationsTabTitle" [hasWarning]="notificationsTabHasWarning">
+-        <ng-content select="[notifications]"></ng-content>
+-        <ng-content actions select="[notifications]"></ng-content>
+-    </spy-tab>
+ </pyz-tabs>
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Presentation/Components/app/merchant-profile-tabs/merchant-profile-tabs.component.ts
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Presentation/Components/app/merchant-profile-tabs/merchant-profile-tabs.component.ts
+@@ -18,16 +18,8 @@ export class MerchantProfileTabsComponent {
+   @Input({ transform: booleanAttribute }) businessInfoTabHasWarning: boolean;
+   @Input() onlineProfileTabTitle: string;
+   @Input({ transform: booleanAttribute }) onlineProfileTabHasWarning: boolean;
+-  @Input() deliveryAreaTabTitle: string;
+-  @Input({ transform: booleanAttribute }) isDeliveryAreaEnabled = false;
+-  @Input() shipmentsTabTitle: string;
+-  @Input() paymentMethodsTabTitle: string;
+-  @Input() downloadsTabTitle: string;
+   @Input() settingsTabTitle: string;
+   @Input({ transform: booleanAttribute }) settingsTabHasWarning: boolean;
+-  @Input() notificationsTabTitle: string;
+-  @Input({ transform: booleanAttribute }) notificationsTabHasWarning: boolean;
+-  @Input({ transform: booleanAttribute }) isNavReorganised = false;
+   @Input() tabNames = '';
+   @Input() tabQaNames = '';
+ }
+
+--- a/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Presentation/Profile/index.twig
++++ b/src/Pyz/Zed/MerchantProfileMerchantPortalGui/Presentation/Profile/index.twig
+@@ -10,10 +10,6 @@
+ {% set imageFileSize = constant('\\Pyz\\Shared\\MerchantMedia\\MerchantMediaConstants::MAX_SIZE_IN_BYTES_MEDIA_MERCHANT') / 1024 %}
+ {% set documentFileSize = constant('\\Pyz\\Shared\\MerchantMedia\\MerchantMediaConstants::MAX_SIZE_IN_BYTES_DOCUMENT_MERCHANT') / 1024 %}
+ {% set settingsMerchantProfileForm = form.children.settingsMerchantProfile %}
+-{% if not isNavReorganised %}
+-{% set notificationsMerchantProfileForm = form.children.notificationsMerchantProfile %}
+-{% set notificationsMerchantProfileFields = notificationsMerchantProfileForm.children %}
+-{% endif %}
+ {% set settingsMerchantProfileFields = settingsMerchantProfileForm.children %}
+ {% set glossarySettingCollectionFields = settingsMerchantProfileFields.settingGlossaryAttributes.children %}
+ 
+@@ -139,11 +135,6 @@
+ {% block content %}
+     {% set contactAddressFields = onlineProfileMerchantProfileFields.addressCollection.contactAddress %}
+     {% set invoiceAddressFields = onlineProfileMerchantProfileFields.addressCollection.invoiceAddress %}
+-    {% if not isNavReorganised %}
+-        {% set orderTotalMaximumThresholdFields = notificationsMerchantProfileFields.merchantSalesOrderThresholds.orderTotalMaximumThreshold %}
+-        {% set itemSumPriceMaximumThresholdFields = notificationsMerchantProfileFields.merchantSalesOrderThresholds.itemSumPriceMaximumThreshold %}
+-        {% set itemQuantityMaximumThresholdFields = notificationsMerchantProfileFields.merchantSalesOrderThresholds.itemQuantityMaximumThreshold %}
+-    {% endif %}
+     {% set hasBusinessInfoWarning = (
+         (not contactAddressFields.address1.vars.valid)
+         or (not contactAddressFields.address2.vars.valid)
+@@ -170,12 +161,6 @@
+         or (_self.hasGlossaryCollectionErrors(glossaryCollectionFields) == true))
+         | boolToStr %}
+     {% set hasSettingsWarning = (_self.hasSettingGlossaryCollectionErrors(glossarySettingCollectionFields) == true) | boolToStr %}
+-    {% if not isNavReorganised %}
+-        {% set hasNotificationsWarning = ((not orderTotalMaximumThresholdFields.threshold.vars.valid)
+-            or (not itemSumPriceMaximumThresholdFields.threshold.vars.valid)
+-            or (not itemQuantityMaximumThresholdFields.threshold.vars.valid))
+-            | boolToStr %}
+-    {% endif %}
+     {{ form_start(form, {attr: {novalidate: '', withMonitor: true}}) }}
+         <web-pyz-merchant-profile cloak>
+             <span title>{{ 'Profile' | trans }}</span>
+@@ -187,18 +172,8 @@
+                 online-profile-tab-has-warning="{{ hasOnlineProfileWarning }}"
+                 settings-tab-title="{{ 'merchant_profile.tab.settings' | trans }}"
+                 settings-tab-has-warning="{{ hasSettingsWarning }}"
+-                is-nav-reorganised="{{ isNavReorganised ? 'true' : 'false' }}"
+-                is-delivery-area-enabled="{{ isDeliveryAreaEnabled ? 'true' : 'false' }}"
+                 tab-names="{{ tabNames | json_encode() }}"
+                 tab-qa-names="{{ tabQaNames | json_encode() }}"
+-                {% if not isNavReorganised %}
+-                delivery-area-tab-title="{{ 'merchant_profile_merchant_portal_gui.delivery_area.tab.title' | trans }}"
+-                shipments-tab-title="{{ 'merchant_profile.tab.shipment_methods' | trans }}"
+-                payment-methods-tab-title="{{ 'merchant_profile.tab.payment_methods' | trans }}"
+-                downloads-tab-title="{{ 'merchant_profile.tab.downloads' | trans }}"
+-                notifications-tab-title="{{ 'merchant_profile.tab.notifications' | trans }}"
+-                notifications-tab-has-warning="{{ hasNotificationsWarning }}"
+-                {% endif %}
+             >
+                 <div businessInfo>
+                     <div class="spy-row spy-row-gutter-md">
+@@ -518,124 +493,8 @@
+                         </div>
+                     </div>
+                 </div>
+-            {% if not isNavReorganised %}
+-                {% if isDeliveryAreaEnabled %}
+-                    {% set deliveryAreaForm = form.deliveryAreaMerchantProfile %}
+-                    <div deliveryArea>
+-                        {% set deliveryOptionsData = [] %}
+-                        {% for deliveryAreaField in deliveryAreaForm.merchantShipmentMethodDeliveryAreas.children %}
+-                            {% set deliveryOptionsData = deliveryOptionsData|merge([
+-                                deliveryAreaField.vars.value.toArray(true, true)|merge({ 'deliveryAreasFieldName': deliveryAreaField.deliveryAreas.vars.full_name })
+-                            ]) %}
+-                        {% endfor %}
+-                        <div class="spy-row spy-row-gutter-md">
+-                            <div class="spy-col spy-col-gutter-md">
+-                                <web-spy-card class="merchant-profile__card" cloak spy-title="{{ 'merchant_profile_merchant_portal_gui.delivery_area.page.title' | trans }}">
+-                                    <web-pyz-delivery-area
+-                                        zip-codes="{{ zipCodes | json_encode }}"
+-                                        delivery-options="{{ deliveryOptionsData | json_encode }}"
+-                                    >
+-                                    </web-pyz-delivery-area>
+-                                    {% for deliveryAreaField in deliveryAreaForm.merchantShipmentMethodDeliveryAreas.children %}
+-                                        {{ form_row(deliveryAreaField.idMerchantToShipmentMethod) }}
+-                                        {{ form_row(deliveryAreaField.deliveryAreas) }}
+-                                    {% endfor %}
+-                                    {% do deliveryAreaForm.merchantShipmentMethodDeliveryAreas.setRendered %}
+-                                    {% do deliveryAreaForm.save.setRendered %}
+-                                </web-spy-card>
+-                            </div>
+-                        </div>
+-                    </div>
+-                {% endif %}
+-
+-                <div shipments>
+-                    <web-mp-merchant-shipment-method
+-                        cloak
+-                        table-id="web-mp-merchant-shipment-method"
+-                        table-config='{{ guiTableConfiguration(shipmentMethodsTableConfiguration) }}'
+-                    >
+-                        <h1 title>{{ 'merchant_profile.shipment_methods.title' | trans }}</h1>
+-                    </web-mp-merchant-shipment-method>
+-                </div>
+-
+-                <div paymentMethods>
+-                    <web-mp-merchant-payment-methods
+-                        cloak
+-                        create-payment-method-button-label="{{ 'merchant_profile.payment_methods.create' | trans }}"
+-                        create-payment-method-button-url="{{ constant('\\Pyz\\Zed\\MerchantProfileMerchantPortalGui\\MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_PAYMENT_METHOD_CREATE') }}"
+-                        info-message="{{ 'merchant_profile.payment_methods.info' | trans }}"
+-                        table-id="{{ constant('Pyz\\Zed\\MerchantProfileMerchantPortalGui\\MerchantProfileMerchantPortalGuiConfig::TABLE_ID_MERCHANT_PAYMENT_METHOD') }}"
+-                        table-config='{{ guiTableConfiguration(paymentMethodTableConfiguration) }}'
+-                    >
+-                        <h1 title>{{ 'merchant_profile.payment_methods.title' | trans }}</h1>
+-                    </web-mp-merchant-payment-methods>
+-                </div>
+-
+-                <div downloads>
+-                    <web-mp-merchant-downloads
+-                        cloak
+-                        create-merchant-download-button-label="{{ 'merchant_profile_merchant_portal_gui.create_download.button' | trans }}"
+-                        create-merchant-download-button-url="{{ constant('\\Pyz\\Zed\\MerchantProfileMerchantPortalGui\\MerchantProfileMerchantPortalGuiConfig::URL_MERCHANT_DOWNLOAD_CREATE') }}"
+-                        can-create-merchant-download="{{ canCreateMerchantDownload == true ? 'true' : 'false' }}"
+-                        merchant-download-limit="{{ merchantDownloadLimit }}"
+-                        create-merchant-download-button-disabled-description="{{ 'merchant_profile_merchant_portal_gui.create_download.button.disabled.description' | trans }}"
+-                        file-upload-restriction-info-message="{{ (isHarmonizedMediaUploadEnabled ? 'merchant_profile_merchant_portal_gui.create_download.list.info_message' : 'merchant_profile_merchant_portal_gui.create_download.list.info_message.legacy') | trans }}"
+-                        table-id="{{ constant('Pyz\\Zed\\MerchantProfileMerchantPortalGui\\MerchantProfileMerchantPortalGuiConfig::TABLE_ID_MERCHANT_DOWNLOAD') }}"
+-                        table-config='{{ guiTableConfiguration(downloadTableConfiguration) }}'
+-                    >
+-                        <h1 title>{{ 'merchant_profile.downloads.title' | trans }}</h1>
+-                    </web-mp-merchant-downloads>
+-                </div>
+-
+-                <div notifications>
+-                    <div class="spy-row spy-row-gutter-md">
+-                        <div class="spy-col spy-col-gutter-md">
+-                            <web-spy-card class="merchant-profile__card" cloak spy-title="{{ 'merchant_profile.section.order_related.title' | trans }}">
+-                                <div class="merchant-profile__status">
+-                                    <div class="form-group">
+-                                        {{ form_row(orderTotalMaximumThresholdFields.threshold, {
+-                                            row_attr: { 'no-spaces': 'true', },
+-                                            label: 'merchant_profile.order_total_maximum_threshold.label' | trans
+-                                        }) }}
+-                                    </div>
+-                                    <div class="mb-20 mt-8">
+-                                        <web-pyz-alert
+-                                            description="{{ 'merchant_profile.order_total_maximum_threshold.note' | trans }}"
+-                                        ></web-pyz-alert>
+-                                    </div>
+-                                </div>
+-                                <div class="merchant-profile__status">
+-                                    {{ form_row(itemSumPriceMaximumThresholdFields.threshold, {
+-                                        row_attr: { 'no-spaces': 'true', },
+-                                        label: 'merchant_profile.item_sum_price_maximum_threshold.label' | trans
+-                                    }) }}
+-                                    <div class="mb-20 mt-8">
+-                                        <web-pyz-alert
+-                                            description="{{ 'merchant_profile.item_sum_price_maximum_threshold.note' | trans }}"
+-                                        ></web-pyz-alert>
+-                                    </div>
+-                                </div>
+-                                <div class="merchant-profile__status">
+-                                    {{ form_row(itemQuantityMaximumThresholdFields.threshold, {
+-                                        row_attr: { 'no-spaces': 'true', },
+-                                        label: 'merchant_profile.item_quantity_maximum_threshold.label' | trans
+-                                    }) }}
+-                                    <div class="mb-20 mt-8">
+-                                        <web-pyz-alert
+-                                            description="{{ 'merchant_profile.item_quantity_maximum_threshold.note' | trans }}"
+-                                        ></web-pyz-alert>
+-                                    </div>
+-                                </div>
+-                            </web-spy-card>
+-                        </div>
+-                    </div>
+-                </div>
+-            {% endif %}
+             </web-mp-merchant-profile-tabs>
+         </web-pyz-merchant-profile>
+     {% do form.save.setRendered %}
+-    {% if not isNavReorganised %}
+-        {% do form.notificationsMerchantProfile.save.setRendered %}
+-    {% endif %}
+     {{ form_end(form) }}
+ {% endblock %}
+
+--- a/src/Pyz/Zed/ShoppingListMerchantPortalGui/Persistence/ShoppingListMerchantPortalGuiRepository.php
++++ b/src/Pyz/Zed/ShoppingListMerchantPortalGui/Persistence/ShoppingListMerchantPortalGuiRepository.php
+@@ -35,8 +35,6 @@ use Orm\Zed\ShoppingList\Persistence\SpyShoppingListQuery;
+ use Propel\Runtime\ActiveQuery\Criteria;
+ use Propel\Runtime\ActiveQuery\Criterion\LikeCriterion;
+ use Propel\Runtime\ActiveQuery\Join;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+-use Pyz\Zed\Kernel\FeatureFlagAwareTrait;
+ use Pyz\Zed\ShoppingListMerchantPortalGui\Communication\GuiTable\ConfigurationProvider\ShoppingListMerchantPortalGuiTableConfigurationProvider;
+ use Spryker\Zed\Kernel\Persistence\AbstractRepository;
+ 
+@@ -47,8 +45,6 @@ use Spryker\Zed\Kernel\Persistence\AbstractRepository;
+  */
+ class ShoppingListMerchantPortalGuiRepository extends AbstractRepository implements ShoppingListMerchantPortalGuiRepositoryInterface
+ {
+-    use FeatureFlagAwareTrait;
+-
+     public const DEFAULT_SORTING_FIELD = 'id_shopping_list';
+ 
+     /**
+@@ -379,35 +375,20 @@ class ShoppingListMerchantPortalGuiRepository extends AbstractRepository impleme
+             Criteria::INNER_JOIN,
+         );
+ 
+-        if ($this->isEnabled(FeatureFlags::FEATURE_MD_4124_FIX_SHOPPING_LIST_LOCALE_JOIN)) {
+-            $localizedAttributesJoin = new Join();
+-            $localizedAttributesJoin->addCondition(
+-                SpyShoppingListItemTableMap::COL_ID_SHOPPING_LIST_ITEM,
+-                PyzShoppingListItemLocalizedAttributesTableMap::COL_FK_SHOPPING_LIST_ITEM,
+-            );
+-            $localizedAttributesJoin->addForeignValueCondition(
+-                PyzShoppingListItemLocalizedAttributesTableMap::TABLE_NAME,
+-                'fk_locale',
+-                null,
+-                $idLocale,
+-                Criteria::EQUAL,
+-            );
+-            $localizedAttributesJoin->setJoinType(Criteria::LEFT_JOIN);
+-            $query->addJoinObject($localizedAttributesJoin);
+-        } else {
+-            $query
+-                ->addJoin(
+-                    SpyShoppingListItemTableMap::COL_ID_SHOPPING_LIST_ITEM,
+-                    PyzShoppingListItemLocalizedAttributesTableMap::COL_FK_SHOPPING_LIST_ITEM,
+-                    Criteria::LEFT_JOIN,
+-                );
+-            $query->where(sprintf(
+-                '(%s = %s OR %s IS NULL)',
+-                PyzShoppingListItemLocalizedAttributesTableMap::COL_FK_LOCALE,
+-                $idLocale,
+-                PyzShoppingListItemLocalizedAttributesTableMap::COL_FK_LOCALE,
+-            ));
+-        }
++        $localizedAttributesJoin = new Join();
++        $localizedAttributesJoin->addCondition(
++            SpyShoppingListItemTableMap::COL_ID_SHOPPING_LIST_ITEM,
++            PyzShoppingListItemLocalizedAttributesTableMap::COL_FK_SHOPPING_LIST_ITEM,
++        );
++        $localizedAttributesJoin->addForeignValueCondition(
++            PyzShoppingListItemLocalizedAttributesTableMap::TABLE_NAME,
++            'fk_locale',
++            null,
++            $idLocale,
++            Criteria::EQUAL,
++        );
++        $localizedAttributesJoin->setJoinType(Criteria::LEFT_JOIN);
++        $query->addJoinObject($localizedAttributesJoin);
+ 
+         $query
+             ->addAsColumn(ProductConcreteTransfer::ID_PRODUCT_CONCRETE, SpyProductTableMap::COL_ID_PRODUCT)
+
+--- a/tests/PyzTest/Yves/MerchantPage/Expander/MerchantViewDataExpanderTest.php
++++ b/tests/PyzTest/Yves/MerchantPage/Expander/MerchantViewDataExpanderTest.php
+@@ -263,29 +263,15 @@ class MerchantViewDataExpanderTest extends Unit
+     /**
+      * @return void
+      */
+-    public function testMerchantPostUrlTransliteratesUmlautsWhenFeatureFlagEnabled(): void
++    public function testMerchantPostUrlTransliteratesUmlauts(): void
+     {
+         // Arrange
+-        $this->tester->setFeatureFlagsEnabled();
+         $capturedMerchantPostUuids = $this->expandAndCaptureMerchantPostUuids('Käse Müesli Größe');
+ 
+         // Assert
+         $this->assertSame('kaese-mueesli-groesse-post-test-uuid-1', $capturedMerchantPostUuids[0]);
+     }
+ 
+-    /**
+-     * @return void
+-     */
+-    public function testMerchantPostUrlKeepsBaseLetterSlugWhenFeatureFlagDisabled(): void
+-    {
+-        // Arrange
+-        $this->tester->setFeatureFlagDisabled();
+-        $capturedMerchantPostUuids = $this->expandAndCaptureMerchantPostUuids('Käse Müesli Größe');
+-
+-        // Assert — without transliteration the umlauts collapse to base letters (today's behavior)
+-        $this->assertSame('kase-muesli-grosse-post-test-uuid-1', $capturedMerchantPostUuids[0]);
+-    }
+-
+     /**
+      * @param string $postName
+      *
+
+--- a/tests/PyzTest/Zed/DataImportMerchantPortalGui/Communication/GuiTable/DataProvider/DataImportMerchantPortalGuiTableDataProviderTest.php
++++ b/tests/PyzTest/Zed/DataImportMerchantPortalGui/Communication/GuiTable/DataProvider/DataImportMerchantPortalGuiTableDataProviderTest.php
+@@ -29,7 +29,6 @@ use PHPUnit\Framework\MockObject\MockObject;
+ use Pyz\Client\Torsk\TorskClient;
+ use Pyz\Client\Torsk\TorskClientInterface;
+ use Pyz\Service\UtilDateTime\UtilDateTimeServiceFactory;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Zed\DataImportMerchantPortalGui\Communication\Expander\TorskJobEntryExpander;
+ use Pyz\Zed\DataImportMerchantPortalGui\Communication\GuiTable\DataProvider\DataImportMerchantPortalGuiTableDataProvider;
+ use Pyz\Zed\MerchantUser\Business\MerchantUserFacade;
+@@ -60,8 +59,6 @@ class DataImportMerchantPortalGuiTableDataProviderTest extends Unit
+ 
+     private DataImportMerchantPortalGuiTableDataProvider $dataImportMerchantPortalGuiTableDataProvider;
+ 
+-    private bool $isRenameFiltersEnabled;
+-
+     /**
+      * @SuppressWarnings("PHPMD.CamelCaseMethodName")
+      *
+@@ -71,10 +68,6 @@ class DataImportMerchantPortalGuiTableDataProviderTest extends Unit
+     {
+         parent::_setUp();
+ 
+-        $this->isRenameFiltersEnabled = $this->tester->getLocator()->featureFlag()->client()->isEnabled(
+-            FeatureFlags::FEATURE_MD_3951_RENAME_IMPORT_HISTORY_FILTERS,
+-        );
+-
+         $this->tester->setDependency(
+             UtilDateTimeDependencyProvider::SERVICE_TIMEZONE,
+             'Europe/Zurich',
+@@ -125,19 +118,11 @@ class DataImportMerchantPortalGuiTableDataProviderTest extends Unit
+             ->setSourceFileName(null)
+             ->setUploadUserReference(null);
+ 
+-        if ($this->isRenameFiltersEnabled) {
+-            $jobChainsRequestTransfer
+-                ->setStartedAtFrom(null)
+-                ->setStartedAtTo(null)
+-                ->setEndDateFrom(null)
+-                ->setEndDateTo(null);
+-        } else {
+-            $jobChainsRequestTransfer
+-                ->setFirstSeenAtFrom(null)
+-                ->setFirstSeenAtTo(null)
+-                ->setProcessedAtFrom(null)
+-                ->setProcessedAtTo(null);
+-        }
++        $jobChainsRequestTransfer
++            ->setStartedAtFrom(null)
++            ->setStartedAtTo(null)
++            ->setEndDateFrom(null)
++            ->setEndDateTo(null);
+ 
+         $this->torskClientMock
+             ->expects(self::once())
+@@ -224,13 +209,8 @@ class DataImportMerchantPortalGuiTableDataProviderTest extends Unit
+             'uploadUserReference' => 'upload_user_reference1',
+         ];
+ 
+-        if ($this->isRenameFiltersEnabled) {
+-            $filters['importStart'] = $dateFromFilter;
+-            $filters['importEnd'] = $dateToFilter;
+-        } else {
+-            $filters['uploaded'] = $dateFromFilter;
+-            $filters['imported'] = $dateToFilter;
+-        }
++        $filters['importStart'] = $dateFromFilter;
++        $filters['importEnd'] = $dateToFilter;
+ 
+         $guiTableDataRequestTransfer->setFilters($filters);
+ 
+@@ -332,17 +312,10 @@ class DataImportMerchantPortalGuiTableDataProviderTest extends Unit
+         $torskJobChainsRequestTransfer->setStatus('status1');
+         $torskJobChainsRequestTransfer->setDataType('file_type1');
+ 
+-        if ($this->isRenameFiltersEnabled) {
+-            $torskJobChainsRequestTransfer->setStartedAtFrom('2022-01-01T00:00:00.000Z');
+-            $torskJobChainsRequestTransfer->setStartedAtTo('2025-01-02T00:00:00.000Z');
+-            $torskJobChainsRequestTransfer->setEndDateFrom('2022-01-01T00:00:00.000Z');
+-            $torskJobChainsRequestTransfer->setEndDateTo('2025-01-02T00:00:00.000Z');
+-        } else {
+-            $torskJobChainsRequestTransfer->setFirstSeenAtFrom('2022-01-01T00:00:00.000Z');
+-            $torskJobChainsRequestTransfer->setFirstSeenAtTo('2025-01-02T00:00:00.000Z');
+-            $torskJobChainsRequestTransfer->setProcessedAtFrom('2022-01-01T00:00:00.000Z');
+-            $torskJobChainsRequestTransfer->setProcessedAtTo('2025-01-02T00:00:00.000Z');
+-        }
++        $torskJobChainsRequestTransfer->setStartedAtFrom('2022-01-01T00:00:00.000Z');
++        $torskJobChainsRequestTransfer->setStartedAtTo('2025-01-02T00:00:00.000Z');
++        $torskJobChainsRequestTransfer->setEndDateFrom('2022-01-01T00:00:00.000Z');
++        $torskJobChainsRequestTransfer->setEndDateTo('2025-01-02T00:00:00.000Z');
+         $torskJobChainsRequestTransfer->setSourceChannel(['bucket']);
+         $torskJobChainsRequestTransfer->setSourceService('merchant');
+         $torskJobChainsRequestTransfer->setDestinationService('laks');
+
+--- a/tests/PyzTest/Zed/MerchantPostMerchantPortalGui/Presentation/LanguageTabSwitcherCest.php
++++ b/tests/PyzTest/Zed/MerchantPostMerchantPortalGui/Presentation/LanguageTabSwitcherCest.php
+@@ -7,7 +7,6 @@
+ 
+ namespace PyzTest\Zed\MerchantPostMerchantPortalGui\Presentation;
+ 
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use PyzTest\Shared\MerchantPost\PageObject\MerchantPostDetailPage;
+ use PyzTest\Zed\MerchantPostMerchantPortalGui\MerchantPostMerchantPortalGuiPresentationTester;
+ 
+@@ -30,12 +29,6 @@ class LanguageTabSwitcherCest
+      */
+     public function _before(MerchantPostMerchantPortalGuiPresentationTester $i): void
+     {
+-        $isEnabled = $i->getLocator()->featureFlag()->client()->isEnabled(FeatureFlags::FEATURE_MD_3440_MP_GLOBAL_LANGUAGE_SWITCH);
+-
+-        if (!$isEnabled) {
+-            $i->markTestSkipped('Global language switch feature flag is disabled');
+-        }
+-
+         $i->haveAllLocalesSupportedForMerchant('pistor');
+ 
+         $i->setActor($i);
+
+--- a/tests/PyzTest/Zed/MerchantPostMerchantPortalGui/Presentation/StickyFooterCest.php
++++ b/tests/PyzTest/Zed/MerchantPostMerchantPortalGui/Presentation/StickyFooterCest.php
+@@ -9,7 +9,6 @@ namespace PyzTest\Zed\MerchantPostMerchantPortalGui\Presentation;
+ 
+ use Facebook\WebDriver\WebDriverKeys;
+ use Orm\Zed\Merchant\Persistence\SpyMerchantQuery;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use PyzTest\Shared\MerchantPost\PageObject\MerchantPostDetailPage;
+ use PyzTest\Zed\MerchantPostMerchantPortalGui\MerchantPostMerchantPortalGuiPresentationTester;
+ 
+@@ -34,12 +33,6 @@ class StickyFooterCest
+      */
+     public function _before(MerchantPostMerchantPortalGuiPresentationTester $i): void
+     {
+-        $isEnabled = $i->getLocator()->featureFlag()->client()->isEnabled(FeatureFlags::FEATURE_MD_3438_MP_STICKY_FOOTER);
+-
+-        if (!$isEnabled) {
+-            $i->markTestSkipped('Sticky footer feature flag is disabled');
+-        }
+-
+         $idMerchant = SpyMerchantQuery::create()->findOneByMerchantReference('pistor')->getIdMerchant();
+         $locales = $i->getLocator()->locale()->facade()->getLocaleCollection();
+         $localeIds = array_map(static fn ($locale) => $locale->getIdLocale(), $locales);
+
+--- a/tests/PyzTest/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/MerchantShipmentMethodDetailsControllerTest.php
++++ b/tests/PyzTest/Zed/MerchantProfileMerchantPortalGui/Communication/Controller/MerchantShipmentMethodDetailsControllerTest.php
+@@ -76,7 +76,7 @@ class MerchantShipmentMethodDetailsControllerTest extends Unit
+         // Assert
+         $this->assertTrue($redirectResponse->isRedirection());
+         $this->assertSame(
+-            '/merchant-profile-merchant-portal-gui/profile?tab=shipments',
++            '/merchant-profile-merchant-portal-gui/delivery',
+             $redirectResponse->getTargetUrl(),
+         );
+     }
+@@ -113,7 +113,7 @@ class MerchantShipmentMethodDetailsControllerTest extends Unit
+         // Assert
+         $this->assertTrue($redirectResponse->isRedirection());
+         $this->assertSame(
+-            '/merchant-profile-merchant-portal-gui/profile?tab=shipments',
++            '/merchant-profile-merchant-portal-gui/delivery',
+             $redirectResponse->getTargetUrl(),
+         );
+     }
+
+--- a/tests/PyzTest/Zed/ShoppingListMerchantPortalGui/Persistence/ShoppingListMerchantPortalGuiRepositoryTest.php
++++ b/tests/PyzTest/Zed/ShoppingListMerchantPortalGui/Persistence/ShoppingListMerchantPortalGuiRepositoryTest.php
+@@ -29,7 +29,6 @@ use Generated\Shared\Transfer\ShoppingListTransfer;
+ use Generated\Shared\Transfer\SpyProductMeasurementUnitEntityTransfer;
+ use Generated\Shared\Transfer\SpyProductPackagingUnitEntityTransfer;
+ use Pyz\Shared\Availability\AvailabilityConstants;
+-use Pyz\Shared\FeatureFlag\FeatureFlags;
+ use Pyz\Shared\Locale\LocaleConstants;
+ use Pyz\Zed\ShoppingListMerchantPortalGui\Persistence\ShoppingListMerchantPortalGuiRepository;
+ use PyzTest\Zed\ShoppingListMerchantPortalGui\ShoppingListMerchantPortalGuiPersistenceTester;
+@@ -441,13 +440,6 @@ class ShoppingListMerchantPortalGuiRepositoryTest extends Unit
+         string $currentLocaleName,
+         string $otherLocaleName
+     ): void {
+-        if (!$this->tester->getLocator()->featureFlag()->client()->isEnabled(FeatureFlags::FEATURE_MD_4124_FIX_SHOPPING_LIST_LOCALE_JOIN)) {
+-            $this->markTestSkipped(sprintf(
+-                'Feature flag "%s" is disabled — skipping MD-4124 regression test.',
+-                FeatureFlags::FEATURE_MD_4124_FIX_SHOPPING_LIST_LOCALE_JOIN,
+-            ));
+-        }
+-
+         // Arrange
+         $this->originalLocaleNameToRestore = Store::getInstance()->getCurrentLocale();
+         Store::getInstance()->setCurrentLocale($currentLocaleName);

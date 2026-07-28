@@ -20,17 +20,17 @@ This command improves the **spryker-review plugin itself** — it does not revie
    - URL → parse `https://gitlab.com/<path>/-/merge_requests/<iid>`
    - `!1234` / `MR 1234` → IID `1234`; project path from `git remote get-url origin`
    - Ticket key → `glab mr list --search "<TICKET>"`; if more than one match, ask the user which.
-2. Locate this plugin's `commands/review.md`. **There should be exactly one real copy.** The plugin is installed as a local `directory`-source marketplace whose plugin source is `"./"`, and the plugin-cache path is a **symlink** to the source repo — so the repo you edit *is* the live plugin, with no cache copy to keep in sync. Confirm that still holds before editing:
+2. Locate this plugin's `commands/review.md`. **There should be exactly one real copy.** The plugin is registered as a local `directory`-source marketplace whose plugin source is `"./"`, so Claude Code loads it from the marketplace's `installLocation` — the source repo itself. The repo you edit *is* the live plugin. Resolve it and check the invariant:
    ```bash
-   # the single source of truth (resolves the symlink if invoked via the cache path)
+   # the single source of truth
    MP=$(python3 -c "import json;print(json.load(open('$HOME/.claude/plugins/known_marketplaces.json'))['code-review-spryker-claude-plugin']['installLocation'])")
    echo "plugin root: $MP"
-   # sanity: the cache entry must be a symlink back to it, not an independent copy
-   find "$HOME/.claude/plugins/cache" -maxdepth 3 -name '1.0.0' -path '*spryker-review*' -exec ls -ld {} \;
-   # and no stray clones should exist anywhere else
+   # THE authoritative check — must print exactly one path
    find ~ -maxdepth 8 -path "*/commands/review.md" -path "*spryker*" 2>/dev/null | xargs -I{} realpath {} | sort -u
    ```
-   The third command must print exactly one resolved path. **If it prints more than one, STOP** — the single-copy setup has regressed into independent clones. Tell the user, show the differences, and ask which is authoritative before continuing. Do not silently pick one.
+   **If it prints more than one, STOP** — the single-copy setup has regressed into independent clones (most likely a `claude plugin install` cycle materialised a real cache directory). Tell the user, show the differences, and ask which is authoritative before continuing. Do not silently pick one.
+
+   The `installed_plugins.json` `installPath` still names a path under `~/.claude/plugins/cache/…`, but for a `directory`-source marketplace that entry is **vestigial**: it may be absent, or a symlink, or get removed by the periodic in-use sweep, and **none of those is a regression** — the plugin keeps loading from `installLocation`. Verify with `claude plugin details spryker-review` (expect 3 skills: `review`, `learn`, `spryker-conventions`) rather than by inspecting the cache path. Do not "repair" a missing cache directory.
 3. The sibling `skills/spryker-conventions/SKILL.md`, `CHANGELOG.md`, and `fixtures/` all live under that same plugin root. Because there is one copy, Step 7 has nothing to sync — but it still verifies the single-copy invariant afterwards.
 
 ## Step 2: Fetch human reviewer feedback
@@ -43,6 +43,10 @@ glab api "projects/${PROJECT_ENC}/merge_requests/<iid>/discussions" --paginate
 Keep only notes where `system == false`. For each kept note capture: author, `position.new_path` + `position.new_line` (fall back to `old_path`/`old_line` if the new side is empty — a comment on a deleted line), body, `resolvable`/`resolved`, and whether the note's author is the MR author (mark as **author reply** — context only, never itself a miss candidate) vs. an actual reviewer.
 
 If there are zero non-system, non-author-reply notes: report "no reviewer feedback on this MR — nothing to learn from" and stop here.
+
+**AI-assisted reviewer comments are usable, but only after independent verification.** Comments posted from a human account may still be the output of a review tool — the tells are machine-formatted severity tags (`**[MEDIUM/CI]**`), an acceptance-criteria table, a findings table, or a checklist. Such a comment is legitimate signal (the account owner chose to post it), but it is **not** an independent human judgement, and if the tool that produced it is *this plugin*, hardening rules against it is a feedback loop that teaches nothing.
+
+So: when the format indicates AI authorship, say so explicitly in the Step 4 table, and **verify every factual claim against the repo yourself before classifying it as MISSED** — run the greps, open the cited lines, confirm the counts. Do not take "zero hits for X under tests/" or "this key is orphaned" on trust; both are cheap to check and both have been wrong. A claim that fails verification is not a rule gap, and must be reported as a *rejected* comment rather than quietly dropped.
 
 ## Step 3: Load the baseline (if one exists)
 
@@ -117,12 +121,7 @@ Show one consolidated table (comment → classification → root cause → propo
 On approval:
 1. Apply each edit **once**, to the single plugin root resolved in Step 1, item 2. Then re-run that step's third command to confirm it still resolves to exactly one path — an edit that somehow produced a second copy means the symlink was replaced by a directory (e.g. by a `claude plugin install` cycle), which silently reintroduces drift. Report it if so.
 
-   Changes take effect **on the next session**, since skills are loaded at startup. Do NOT run `claude plugin update` to "apply" them: the cache is version-keyed, so `update` no-ops while the version is unchanged, and a `uninstall`/`install` cycle would replace the symlink with a real copy and undo the single-copy setup. If that happens, restore it with:
-   ```bash
-   MP=/path/to/plugin/repo
-   CACHE="$HOME/.claude/plugins/cache/code-review-spryker-claude-plugin/spryker-review/1.0.0"
-   rm -rf "$CACHE" && ln -s "$MP" "$CACHE"
-   ```
+   Changes take effect **on the next session**, since skills are loaded at startup. Do NOT run `claude plugin update` or an `uninstall`/`install` cycle to "apply" them — `update` no-ops on an unchanged version, and a reinstall materialises a real cache directory, which is exactly how the single-copy setup regresses into clones. Just restart. If a stray cache copy does appear, delete it (`rm -rf "$HOME/.claude/plugins/cache/code-review-spryker-claude-plugin"`); the plugin loads from the marketplace `installLocation` and does not need it.
 2. Append one line per applied rule to the plugin-root `CHANGELOG.md` (create it if absent):
    ```
    - YYYY-MM-DD — MR !<iid> (<ticket>): <one-line generalized rule summary> → <file touched>
