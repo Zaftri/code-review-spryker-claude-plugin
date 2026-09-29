@@ -103,6 +103,129 @@ Both Critical and Blocker are exempt from the Step 3 signal-budget cap and from 
 
 **A passing test is not a reachability proof** — hand-built fixtures construct impossible states routinely (see rule 7's unreachable-guard bullet, which is this same discipline applied to guards). **Nor is cross-pass convergence**: several passes agreeing on a mechanism means they share a blind spot, not that the input exists. This is the single most common way this review has over-rated findings; the mechanism is the cheap half, reachability is the half that decides severity.
 
+## Step 1E: Evidence gates (mandatory; run BEFORE a severity is written down)
+
+The reachability gate above decides *whether the bad state is possible*. These three decide *whether the
+finding is about this MR at all*, *whether its fix is real*, and *whether its claims were read or assumed*.
+All three are satisfiable only by a command's output or quoted source — **never by confident prose.** Each
+was added after a review shipped a wrong finding that passed every other gate.
+
+### Gate P — Provenance (who wrote the cited line?)
+
+**A review rates a change, not a codebase.** Severity is charged to the MR only for lines the MR wrote.
+Before rating any finding above Nit, run all three:
+
+```bash
+git diff --name-only <range> | grep -qx '<file>'                  # 1. is the file in the diff at all?
+git diff <range> -- '<file>' | grep -nE '^\+.*<cited construct>'  # 2. is the CITED LINE an added/changed line?
+git blame -L <n>,<n> <head> -- '<file>'                           # 3. who wrote it, and when?
+```
+
+| Outcome | Rating |
+|---|---|
+| Cited line appears as `^+` in this diff | normal severity |
+| **File is in the diff but the cited line is unchanged** | **cap at Nit**, file it under "pre-existing", never in the blocking list |
+| File is not in the diff | report **only** if this MR's own change orphaned or invalidated it; label "caused by this MR", cap at Minor, never blocking |
+
+**The append trap — this is the one that actually fires.** A file appearing in `git diff --name-only` does
+**not** put its whole contents in scope. An MR that appends one method to a 300-line test file makes *that
+method* reviewable, not the 280 lines above it. Step 2 of the check exists precisely because step 1 passes.
+Observed: a `setDependency()` CLAUDE.md violation rated **Major** against an author whose MR only appended a
+test at the end of the file; `git blame` showed the cited lines were written by two different people, one of
+them three years earlier.
+
+A pre-existing defect may still be worth *mentioning* — say so in one line and move on. It never gates a merge,
+and it is never counted in `counts_by_severity`.
+
+### Gate S — Symbol existence (is the suggested fix real code?)
+
+**A suggested fix is a code claim and carries the same burden of proof as the defect.** For every fix that
+names a method, property, column, constant or config key, cite where that symbol is declared:
+
+```bash
+grep -rn 'function <method>' <the type the fix calls it on>     # method exists on THAT type?
+docker compose exec postgres psql -U postgresuser -d <db> -c '\d <table>'   # column actually exists?
+```
+
+Keep these three distinct — conflating them is the usual failure: **a transfer property is not an entity
+getter is not a DB column.** Spryker derives many transfer properties at read time from a *different* table;
+the Propel entity for the same concept has no such accessor.
+
+If the symbol cannot be shown to exist on the type the fix calls it on, **drop the fix and recompute the
+finding's severity without it.** A finding whose only proposed fix is impossible is usually misdiagnosed —
+treat the impossible fix as evidence against the diagnosis, not as a detail to patch.
+Observed: a **Major** recommending `$merchantEntity->getIsExternalSupplier()` where no such column exists;
+the property is derived in-memory from membership in another table, and the scenario was unreachable anyway.
+
+**No-op-fix check.** A fix phrased as "move X out of branch Y" / "emit this on both paths" / "add the guard"
+must quote the current code showing X is *inside* Y, or that the guard is absent. If the code already does
+what the fix asks, the finding is void — not downgraded, **void**.
+Observed: "the publish fires only on the create path, move it outside" — the branch was in a different class
+entirely, and the emit was already unconditional.
+
+### Gate Q — Quoted source for control-flow claims
+
+**No finding survives on a paraphrase.** Any claim of the shape "runs only on path P", "the early return fires
+first", "the caller never handles null", "this is the sole writer" must paste **≤15 lines of the actual source
+with `file:line`**, in the finding itself. The reachability gate's `unreachable — <constraint>` verdict is
+covered by this too: cite the constraint's source line or the command output that shows it, do not describe it.
+
+The validator re-reads the pasted lines, not the sentence around them. A finding that asserts control flow
+without quoting it is returned as **INCONCLUSIVE**, never CONFIRMED.
+
+Rationale: every over-rated finding this command has shipped was *internally coherent* — the mechanism was
+described accurately and the conclusion followed from the premise. What was missing each time was that nobody
+opened the file the premise was about. Prose fluency is not evidence, and a chain of agents each trusting the
+last converts one unread file into a confident consensus.
+
+## Step 1F: Confidence bands (derived from Step 1E gates — never free-typed)
+
+Every finding carries a confidence band. **The band is computed from which gates were cleared, not from how
+sure the author feels and not from how many passes agreed.** A free-typed percentage is a vibe that doubles as
+a hedge — it lets a finding skip verification by pre-apologising for itself. Confidence here is an audit trail:
+it tells the reader exactly what was checked, so a low band is a to-do list, not an apology.
+
+| Band | Shorthand | Requires | Meaning |
+|---|---|---|---|
+| **Verified** | 95%+ | Gates P + S + Q + a reachability verdict, **plus executed evidence** — a test run, a DB query, a `php -r`, a command's output pasted | The machine was made to show it |
+| **Confirmed** | 80–94% | Gates P + S + Q, reachability verdict cited from source, nothing executed | Every line it rests on was read |
+| **Probable** | 50–79% | Gate P passes and the mechanism is quoted, but reachability is `unverifiable here` | Real shape, unproven trigger |
+| **Speculative** | <50% | any gate unmet | Not a finding yet — a lead |
+
+### Two rules that make the band bite rather than decorate
+
+1. **Severity is capped by confidence.** Bands map to a severity ceiling: Speculative ⇒ **Nit and never in the
+   blocking list**; Probable ⇒ **Minor**; Confirmed ⇒ any tier; Verified ⇒ any tier. A "Critical at 40%" is not
+   a Critical, it is an open question — file it as one. This is the mechanism that would have kept three wrong
+   findings out of MD-5141's blocking list without anyone having to catch them by hand.
+2. **Confidence is capped by the gates *the reporting agent itself ran*.** Agreement between passes contributes
+   **exactly zero** to the band. Inheriting a claim from another pass, from the parent's punch list, or from the
+   validator does not raise confidence — only opening the file does. This is deliberate and is the whole point:
+   the failure mode being defended against is four agents converging on one unread file.
+
+### Three-axis form — required whenever a finding is factually true but may not be this MR's
+
+A single number is lossy for the most common bad-finding shape. When Gate P shows the cited line is
+pre-existing, or when the impact is bounded by data volume, split the axes and report all three:
+
+```
+Minor | DefaultShipmentMethodProvisioner.php:68 | missing index
+  fact:      99%  verified — `\d spy_shipment_method` shows no index on shipment_method_key
+  ownership: 15%  Gate P — pre-existing; no schema file in this diff
+  impact:    20%  table holds 8 rows; one lookup per merchant
+  => report as FYI, not as a finding against this MR
+```
+
+**Most bad review findings are high-fact / low-ownership, or high-fact / low-impact** — true statements that
+are not this MR's problem or not worth anyone's time. Collapsing them to one number hides precisely the
+distinction that decides whether the author should act. `fact` may be high while the finding is still dropped.
+
+### Calibration honesty
+
+Prefer the **band label** in prose; the percentage is shorthand for the band, not a claim of calibration nobody
+has. Never write a bare number without the gate evidence that produced it. If you cannot name which gate gives
+you the band, the band is Speculative by definition.
+
 ## Step 2: Rule sheet (always loaded into every review agent)
 
 Every dispatched agent MUST receive these as ground rules, in priority order:
@@ -273,7 +396,7 @@ Use the **Agent** tool. Send all independent passes in a SINGLE message with mul
 Each agent prompt MUST:
 - State the goal and the specific files in scope (don't make them re-discover).
 - Include the Step 2 rule sheet inline. For Pass A/B/E, include the relevant **rule-9 idiom checks verbatim** and the grep commands — these are the findings most often missed, and they must be passed explicitly, not summarized away.
-- Demand findings as `severity | file:line | primary rule | what's wrong | suggested fix`. List secondary rules in parentheses if relevant (e.g. `SoC (also: KISS, SRP)`); pick **one primary rule** per finding to avoid triple-counting.
+- Demand findings as `severity | confidence-band | file:line | primary rule | what's wrong | suggested fix`, where the band is the Step 1F value derived from the gates THIS agent ran (never inherited from another pass), and the severity already respects the Step 1F ceiling. List secondary rules in parentheses if relevant (e.g. `SoC (also: KISS, SRP)`); pick **one primary rule** per finding to avoid triple-counting.
 - For security findings: include a Given/When/Then attack scenario.
 - **Signal budget — strict:**
   - Only include findings that would change code or shipping decisions. Drop pure preference, drop "smell-only" with no concrete fix.
@@ -281,6 +404,16 @@ Each agent prompt MUST:
   - **Exception — Spryker idiom & convention checks (rule 9) are NEVER dropped for being low-severity.** They are deterministic, grep-detectable, and reliably flagged by human reviewers; report every instance even if Minor/Nit and even past the 30-finding cap. List them in a separate "Convention" block so they don't crowd out judgment-based findings. The "drop lowest tier" rule never applies to them.
   - **But the Convention block has its own ceiling: 40 items.** Several rule-9 checks are complete enumerations by construction (9f over every added/changed method; 9a over every added `@api`; 9d over every misplaced test helper), so on a large diff the exempt category can grow without bound — which reopens the signal problem from the other side. Past 40, **collapse per rule into one aggregate finding** rather than truncating: `9f — 23 further methods declared wider than their usage: <file:line list>`. This preserves completeness (nothing is silently dropped, the list is still actionable) while keeping the block readable. Never emit an aggregate for Critical or Blocker items.
   - Severity: use the five canonical tiers defined in **Step 1D** and no other words. If unsure between two tiers, drop one tier — except rule-9 items, which are reported at whatever tier they merit regardless.
+- **Run the Step 1E evidence gates on every finding before writing its severity.** Each finding must carry, inline:
+  `provenance:` the `git diff`/`git blame` result proving the cited line is an added line of THIS diff (Gate P);
+  `fix-symbol:` the declaration site of every symbol the suggested fix names, or "n/a — no symbol named" (Gate S);
+  and, for any claim about control flow or "the only writer/caller", the **quoted source** that shows it (Gate Q).
+  Then assign the Step 1F **confidence band** from the gates YOU ran — Verified / Confirmed / Probable /
+  Speculative — and apply its severity ceiling (Speculative ⇒ Nit, never blocking; Probable ⇒ Minor max).
+  Agreement with another pass raises the band by **zero**. Use the three-axis form (`fact` / `ownership` /
+  `impact`) whenever Gate P shows the cited line is pre-existing or the impact is bounded by data volume.
+  A finding missing these is capped at Nit regardless of how severe the mechanism looks. Do not paraphrase a file
+  you have not opened in this run — open it, or mark the finding `unverified`.
 - **Render a reachability verdict on every correctness/data-integrity finding before assigning its severity** (Step 1D reachability gate). For each such finding write one line: `reachable — <concrete trigger>` / `unreachable — <constraint that forbids it>` / `unverifiable here — <what would settle it>`. Do the enumeration *before* choosing the tier, not after: the natural order is to trace the bad outcome and stop, which is exactly what over-rates findings. Cheap places the answer usually lives: form types (`NotBlank`, `'disabled' => true`, `required`), schema (`required="true"`, NOT NULL, column encoding), the write path (does an empty submission purge or no-op?), whether a delete method or `onDelete` even exists, and whether the producing type can hold the state at all. **Unreachable ⇒ Nit**, however severe the hypothetical.
 - **Self-check every suggested fix against rules 1–9 before writing it down.** The fix is part of the review's output and is held to the same standard as the code. Before proposing "move it to X" / "extract to Y", verify the destination is architecturally legal: is X a thin entry-point class that must not hold logic (9m)? Does an existing Core extension point already own this (9n)? Does X's layer permit it? Does it mint speculative public API (9e) or an interface the project forbids (ISP)? **A fix a human reviewer would themselves comment on is worse than no fix — it launders one finding into a new violation.** *(The Step 4 validator re-checks this independently. That duplication is deliberate — this is a failure mode the review has actually shipped, so it gets two gates. The pass author is responsible for getting the fix right; the validator is the backstop and has final say. Do not "simplify" by removing either.)*
 - Cap response length (~400-600 words per agent).
@@ -391,6 +524,27 @@ Spawn ONE more agent (`subagent_type: general-purpose`) that:
   - **Symmetry-is-good rationalization** — when a pass praised a change as "shared / centralized / symmetric / all paths route through one builder", do NOT accept it at face value. That framing is a common blind spot: verify each shared consumer actually needs the shared behavior (see over-fetch cross-check below) before endorsing it.
   - **"Deliberate parity mirror" rationalization** — the write-only twin of the above. When a pass excuses or downgrades a reader-less column/field as "intentional parity", "mirrors its siblings", or "the write is already tested", do not accept it: apply rule 7's write-only sub-case (ii) yourself before endorsing the downgrade. Seen in MD-2505, where M3 was downgraded Major→Minor as a "deliberate, tested parity mirror" while the twig read `order.totals.*` and the merchant-scoped `MerchantOrderTransfer::totals` had no reader at all.
   - **CLAUDE.md-backed findings** — never mark a finding CONFIRMED-then-downgraded or DISPUTED on the grounds of "team taste" when it cites a `./.claude/CLAUDE.md` rule; those are crucial (Blocker minimum). Equally, do not upgrade a "the code matches CLAUDE.md, so it's fine" note into a settled Confirmation when a human reviewer might request the opposite — re-file it as an open question.
+  - **Gate P — provenance.** For EVERY finding rated above Nit, re-run the diff-membership and `git blame` checks
+    yourself. Any finding whose cited line is not an added line of this diff is **downgraded out of the blocking
+    list** and moved to a "pre-existing — not this MR's" section, however valid the defect. Watch specifically for
+    the **append trap**: a file present in `git diff --name-only` whose cited lines the MR never touched. Do not
+    accept a pass's file list as evidence of scope.
+  - **Gate S — symbol existence.** For EVERY suggested fix, confirm each symbol it names exists on the type it is
+    called on (transfer property ≠ entity getter ≠ DB column). A fix you cannot prove is implementable is dropped,
+    and you then re-derive the finding's severity WITHOUT it — an impossible fix is evidence the diagnosis is wrong,
+    not a detail to patch. Also reject **no-op fixes**: if the code already does what the fix asks, mark the finding
+    VOID, not downgraded.
+  - **Gate Q — quoted source.** A finding asserting control flow ("only on the create path", "the sole writer",
+    "the caller never handles null") without ≤15 quoted lines at `file:line` is returned **INCONCLUSIVE**. Re-read
+    the source yourself before any CONFIRMED. **You may not CONFIRM a Critical/Major on the strength of pass
+    agreement** — independently satisfy Gates P, Q and reachability first. Consensus among passes that all skipped
+    the same file is the failure mode, not corroboration.
+  - **Recompute the Step 1F confidence band for every finding, from scratch.** Do not inherit the pass's band —
+    it is only valid for the gates that pass ran. Your band reflects the gates **you** cleared. Apply the
+    severity ceiling afterwards: anything you land at Speculative leaves the blocking list, and anything at
+    Probable is capped at Minor, no matter how alarming the mechanism reads. Where a finding is factually true
+    but the cited line is pre-existing or the impact is volume-bounded, rewrite it into the three-axis form
+    (`fact` / `ownership` / `impact`) rather than arguing the single number up or down.
   - **Suggested-fix legality.** Re-read the *fix* text of every Critical/Major/Minor finding, not only its diagnosis. Reject and rewrite any fix whose destination violates the rule sheet: logic pushed into a `*Facade`/`*Service`/`*Client` body (9m); a shared helper introduced to de-duplicate logic an existing Core extension point should own (9n); a new public Facade/Service method for a one-off (9e); a new interface outside Facade/Plugin/Service/Client (ISP). A correct diagnosis with an illegal fix still earns a reviewer comment — mark it **CONFIRMED-with-corrected-fix** and state the legal destination.
 - **Cross-pass synthesis checks** (mechanical; raise NEW findings if matched):
   - **Runtime parity.** If Pass C2 found a backfill console / migration / post-deploy task that fixes a column or state, search Pass A/B findings for the matching runtime creation path. If no Pass A/B finding asserts the runtime path also sets it ⇒ raise a NEW Critical "one-shot fix without runtime parity" (e.g. `BackfillMerchantAclGroupFkMerchantConsole` exists, but runtime `AclEntityCreator::createAclEntitiesForMerchant` doesn't `setFkMerchant` — new merchants leak ACL). Existence of a runtime path is not sufficient on its own: if that runtime path's own *trigger* (e.g. a Publisher/Listener's republish condition) is itself gated by the SAME flag it exists to reconcile, check BOTH toggle directions — flag ON→OFF (rollback) and flag OFF→ON-after-initial-deploy (the one-shot backfill already ran as a no-op while off) — for staleness, not just whether the path exists at all. A trigger gated on its own reconciliation flag is a one-way valve.
@@ -412,6 +566,15 @@ Consolidate findings into a single punch list grouped by the five **Step 1D** ti
 - Open questions for the implementer
 - Skipped / not reviewed
 - Recommended next steps
+
+**Synthesizer discipline.** Do not promote a finding into the Critical/Blocker/Major list unless YOU (the parent)
+have personally run Gates P, S and Q on it — not the pass, not the validator. A pass's report is a lead, not a
+verified fact; your punch list is what the validator sees, so an unverified claim you pass along becomes consensus.
+Anything you have not personally checked is marked `unverified-by-parent` and capped at Minor. When handing the
+punch list to the validator, include the **raw cited source lines**, not only your prose summary of them.
+
+**If a finding is withdrawn after the synthesis is written, record the withdrawal in the file** with the evidence
+that killed it — a retraction is a review output, and a silently deleted finding teaches nothing.
 
 **Always save the synthesis to a file:**
 ```
@@ -436,12 +599,18 @@ passes_degraded: []                   # passes that errored / returned empty / w
 passes_skipped: [B']                  # triggers didn't match — expected, not a degradation
 verdict: block_merge                  # block_merge | proceed_with_caveats | clean
                                       # `clean` requires: 0 critical AND 0 blocker AND passes_degraded == []
+                                      # and no blocking finding below the Confirmed band
 counts_by_severity:
   critical: 7
   blocker: 3
   major: 25
   minor: 22
   nit: 8
+counts_by_confidence:                 # Step 1F bands, AFTER the validator recomputed them
+  verified: 4
+  confirmed: 9
+  probable: 6
+  speculative: 2                      # these are Nit-capped and excluded from the blocking list
 validator_status:
   confirmed: 11
   disputed: 1
