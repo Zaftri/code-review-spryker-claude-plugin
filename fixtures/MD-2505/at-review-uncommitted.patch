@@ -1,0 +1,58 @@
+# RECONSTRUCTED fixture — not extracted from git history.
+#
+# The rev-14 baseline reviewed the working tree, which included an uncommitted
+# ProductDepositOrderItemExpanderPlugin. Its synthesis recorded finding n1 at
+# `ProductDepositOrderItemExpanderPlugin.php:27` — an `@api` tag on the plugin method —
+# and filed it Nit with the reasoning "Not a strict 9a violation (9a is interface-scoped)".
+#
+# That uncommitted state is unrecoverable: the author removed the tag before committing, so
+# no commit on the branch contains it (`git diff origin/main...b3e79977ca | grep '^+.*@api'`
+# returns nothing). This hunk reconstructs the shape from the baseline's own citation so the
+# broadened 9a Detect: command has a true-positive regression case.
+#
+# Provenance: baseline n1 citation, MD-2505-spryker-review.md (rule_sheet_revision 14).
+# Purpose: assert 9a fires on `@api` in a CONCRETE Pyz class, not only in `*Interface.php`.
+
+diff --git a/src/Pyz/Zed/ProductDeposit/Communication/Plugin/Sales/ProductDepositOrderItemExpanderPlugin.php b/src/Pyz/Zed/ProductDeposit/Communication/Plugin/Sales/ProductDepositOrderItemExpanderPlugin.php
+new file mode 100644
+--- /dev/null
++++ b/src/Pyz/Zed/ProductDeposit/Communication/Plugin/Sales/ProductDepositOrderItemExpanderPlugin.php
+@@ -0,0 +1,34 @@
++<?php
++
++/**
++ * This file is part of the Pistor.ch mercanto project.
++ * For full license information, please view the LICENSE file that was distributed with this source code.
++ */
++
++namespace Pyz\Zed\ProductDeposit\Communication\Plugin\Sales;
++
++use Spryker\Zed\Kernel\Communication\AbstractPlugin;
++use Spryker\Zed\SalesExtension\Dependency\Plugin\OrderItemExpanderPluginInterface;
++
++/**
++ * @method \Pyz\Zed\ProductDeposit\Business\ProductDepositFacadeInterface getFacade()
++ * @method \Pyz\Zed\ProductDeposit\Communication\ProductDepositCommunicationFactory getFactory()
++ * @method \Pyz\Zed\ProductDeposit\ProductDepositConfig getConfig()
++ */
++class ProductDepositOrderItemExpanderPlugin extends AbstractPlugin implements OrderItemExpanderPluginInterface
++{
++    /**
++     * {@inheritDoc}
++     *
++     * @api
++     *
++     * @param array<\Generated\Shared\Transfer\ItemTransfer> $itemTransfers
++     *
++     * @return array<\Generated\Shared\Transfer\ItemTransfer>
++     */
++    public function expand(array $itemTransfers): array
++    {
++        $productDepositService = $this->getFactory()->getProductDepositService();
++        foreach ($itemTransfers as $itemTransfer) {
++            $productDepositService->hydrateItemDepositsFromMetadata($itemTransfer);
++        }
++
++        return $itemTransfers;
++    }
++}

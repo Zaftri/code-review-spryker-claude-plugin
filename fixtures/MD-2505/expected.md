@@ -36,6 +36,44 @@ Any future run on this diff MUST NOT propose that destination. Specifically:
   both call (9n's corollary) — the duplication is evidence of wrong-layer placement, and the
   legal destination is a `*OrderItemExpanderPlugin` in the Sales stack.
 
+## Round 2 — rev-14 baseline, reviewer comments 2026-07-29 / 2026-08-03
+
+Second review of this MR (`rule_sheet_revision: 14`, verdict `proceed_with_caveats`,
+`major: 2, minor: 5, nit: 3`). Rules broadened *because of* this round: 9a's Detect scope, rule 7's
+schema-column sub-cases, rule 7's template-guard clause, and two validator checks.
+
+### MUST fire
+
+| Rule | Site | Why |
+|---|---|---|
+| **rule 7 — unreachable defensive guard (template clause)** | `Partials/order_items_list.twig` (`diff.patch:566`) | `(itemDepositTotals is defined ? itemDepositTotals[orderItem.idSalesOrderItem] : 0)` — `DetailController::totalItemListAction()` passes `itemDepositTotals` unconditionally (`[]` on the flag-OFF branch), so `is defined` is always true. The guard is dead **and** guards the wrong axis: the key access on the empty array is unguarded. Severity: Minor (dead guard) with the unguarded key access called out. Round 1 and the rev-14 baseline both missed this. |
+| **9a (broadened Detect)** | `at-review-uncommitted.patch:43` — `@api` on `ProductDepositOrderItemExpanderPlugin::expand()` | A **concrete class**, not an interface. The pre-broadening Detect (`-- 'src/Pyz/**Interface.php'`) matched 0 lines here, which is precisely why the rev-14 baseline filed it Nit reasoning "not a strict 9a violation (9a is interface-scoped)". |
+| **rule 7(ii) — write-only schema column** | `spy_merchant_sales_order.schema.xml` — `mercanto_fee_total`, `deposit_total` | Written via `MerchantSalesOrderMapper` and test-asserted, but no read path consumes them; the display reads `merchantOrder.order.totals.*` (order-wide `spy_sales_order_totals`) while these columns are merchant-scoped. Severity: **Major** — scope-correctness gap, not documentation. |
+| **validator: deferred backfill** | same two columns | Both `default="0"`, no `config/post-deploy/*.yml` in the diff. Minor, as a prerequisite of the future reader. |
+
+### MUST NOT happen (calibration guards)
+
+| Anti-case | Why |
+|---|---|
+| **The write-only column finding must NOT be downgraded to Minor/doc-nit** | The rev-14 validator did exactly this — "a deliberate, tested parity mirror of the sibling `tax_total`/`refund_total`/`canceled_total` columns — not accidental dead schema". Human reviewer bitzeta raised it as blocking on 2026-08-03. A sibling column with no reader is precedent for the same gap, not a defence. This is the regression case for the "Deliberate parity mirror" watch-list entry. |
+| **9a must NOT fire on `diff.patch`** | The committed diff contains 0 `@api` additions (the author removed the tag before committing). Firing there would mean the rule is matching file paths rather than added lines. |
+| **The template-guard clause must NOT fire on `\| default(0)` alone** | The *fixed* form on the current branch is `itemDepositTotals[orderItem.idSalesOrderItem] \| default(0)` with no `is defined`. A rule that flags the fix is matching the variable, not the dead guard. |
+
+### Verification run — 2026-08-04
+
+| Check | Result |
+|---|---|
+| Template-guard Detect fires on `diff.patch` | ✅ 1 match, line 566 |
+| Template-guard Detect silent on unrelated `MD-4743/diff.patch` | ✅ 0 |
+| Broadened 9a Detect fires on `at-review-uncommitted.patch` | ✅ 1 match, line 43 (concrete class) |
+| **Pre-broadening** 9a Detect on the same file | ✅ 0 — confirms the path filter was the defect, not agent error |
+| Broadened 9a Detect silent on `MD-4743/diff.patch` | ✅ 0 |
+| rule 7(ii) trigger (`added <column name=`) discriminates | ✅ MD-2505 = 2, MD-4743 = 0 |
+
+Still judgment-dependent, not mechanically verified: the write-only **severity** decision and the
+parity-mirror anti-downgrade both require agent reasoning over the ticket's stated data source; the
+greps above only prove the trigger fires.
+
 ## Verification run — 2026-07-27
 
 Detection commands executed against `diff.patch` (not merely asserted):
